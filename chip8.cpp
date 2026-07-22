@@ -71,24 +71,19 @@ bool chip8::Fetch(void)
     return true;
 }
 
+void chip8::Execute(void)
+{
+
+}
+
 bool chip8::Cycle(void)
 {
     if(!Fetch())
         return false;
+    
     Execute();
-}
 
-void chip8::OP_00E0(void) //clear screen
-{
-    for(int i = 0; i < VIDEO_HEIGHT * VIDEO_WIDTH; i++)
-        video[i] = 0;
-}
-
-void chip8::OP_1NNN(void) //jump to NNN
-{
-    uint16_t jump_adress = opcode & 0x0FFF; // mask for 12 least significant bits
-
-    pc = jump_adress;
+    return true;
 }
 
 void chip8::Print_Memory(int start)
@@ -103,4 +98,40 @@ void chip8::Print_Memory(int start)
         std::cout << std::setw(2) << std::setfill('0') << static_cast<int>(memory[i]) << ' ';
         aux++;
     }
+}
+
+void chip8::OP_00E0(void) //clear screen
+{
+    for(int i = 0; i < VIDEO_HEIGHT * VIDEO_WIDTH; i++)
+        video[i] = 0;
+}
+
+void chip8::OP_1NNN(void) //jump to NNN
+{
+    uint16_t jump_adress = opcode & 0x0FFF;
+
+    pc = jump_adress;
+}
+
+void chip8::OP_6XNN(void) //set register VX to value NN
+{
+    uint8_t reg_number = (opcode & 0x0F00) >> 8;
+    uint8_t value = opcode & 0x00FF;
+
+    registers[reg_number] = value;
+}
+
+void chip8::OP_7XNN(void) //add value NN to register VX
+{
+    uint8_t reg_number = (opcode & 0x0F00) >> 8;
+    uint8_t value = opcode & 0x00FF;
+
+    registers[reg_number] += value;
+}
+
+void chip8::OP_ANNN(void) //set index to value NNN
+{
+    uint16_t value = opcode & 0x0FFF;
+
+    index = value;
 }

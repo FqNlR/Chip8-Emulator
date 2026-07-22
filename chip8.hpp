@@ -37,4 +37,7 @@ class chip8
         void Execute(void);
         void OP_00E0(void); //clear screen
         void OP_1NNN(void); //jump to NNN
+        void OP_6XNN(void); //set register VX to value NN
+        void OP_7XNN(void); //add value NN to register VX
+        void OP_ANNN(void); //set index to value NNN
 };
