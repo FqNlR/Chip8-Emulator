@@ -101,7 +101,7 @@ void chip8::Execute(void)
             break;
 
         case 0x5000:
-            if(opcode & 0x000F == 0)
+            if((opcode & 0x000F) == 0)
                 OP_5XY0();
             else
                 Warning(0);
@@ -116,7 +116,7 @@ void chip8::Execute(void)
             break;
 
         case 0x9000:
-            if(opcode & 0x000F == 0)
+            if((opcode & 0x000F) == 0)
                 OP_9XY0();
             else
                 Warning(0);
