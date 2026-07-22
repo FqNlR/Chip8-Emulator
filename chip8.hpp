@@ -38,6 +38,12 @@ class chip8
         void Execute(void);
         void OP_00E0(void); //clear screen
         void OP_1NNN(void); //jump to NNN
+        void OP_2NNN(void); //calls subroutine at NNN
+        void OP_00EE(void); //return from subroutine
+        void OP_3XNN(void); //skip one instruction if value in VX is equal to NN
+        void OP_4XNN(void); //skip one instruction if value in VX is NOT equal to NN
+        void OP_5XY0(void); //skip one instruction if value in VX is equal to value in VY
+        void OP_9XY0(void); //skip one instruction if value in VX is NOT equal to value in VY
         void OP_6XNN(void); //set register VX to value NN
         void OP_7XNN(void); //add value NN to register VX
         void OP_ANNN(void); //set index to value NNN
