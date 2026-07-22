@@ -73,7 +73,35 @@ bool chip8::Fetch(void)
 
 void chip8::Execute(void)
 {
+    switch(opcode & 0xF000) //decoding
+    {
+        case 0x0000:
+            if(opcode == 0x00E0)
+                OP_00E0();
+            else
+                std::cout << "unknown instruction" << std::endl;
+            break;
 
+        case 0x1000:
+            OP_1NNN();
+            break;
+
+        case 0x6000:
+            OP_6XNN();
+            break;
+
+        case 0x7000:
+            OP_7XNN();
+            break;
+
+        case 0xA000:
+            OP_ANNN();
+            break;
+        
+        default:
+            std::cout << "unknown instruction" << std::endl;
+            break;
+    }
 }
 
 bool chip8::Cycle(void)
@@ -86,18 +114,22 @@ bool chip8::Cycle(void)
     return true;
 }
 
-void chip8::Print_Memory(int start)
+void chip8::Print_Registers(void)
 {
-    int aux = 0;
+    std::cout << "registers: " << std::hex << static_cast<int>(registers[1]) << " index: " << static_cast<int>(index) <<
+    " pc: " << static_cast<int>(pc) << std::endl;
+}
 
-    for(int i = start; i < MEMORY_SIZE; i++)
+void chip8::Print_Memory(const int start, const int num_bytes)
+{
+    for(int i = start; i < num_bytes; i++)
     {
-        if(aux % 16 == 0)
+        if((i - start) % 16 == 0)
             std::cout << std::endl << "0x" << std::hex << std::setw(3) << std::setfill('0') << i << ": "; 
 
         std::cout << std::setw(2) << std::setfill('0') << static_cast<int>(memory[i]) << ' ';
-        aux++;
     }
+    std::cout << std::endl;
 }
 
 void chip8::OP_00E0(void) //clear screen
@@ -108,9 +140,9 @@ void chip8::OP_00E0(void) //clear screen
 
 void chip8::OP_1NNN(void) //jump to NNN
 {
-    uint16_t jump_adress = opcode & 0x0FFF;
+    uint16_t jump_address = opcode & 0x0FFF;
 
-    pc = jump_adress;
+    pc = jump_address;
 }
 
 void chip8::OP_6XNN(void) //set register VX to value NN

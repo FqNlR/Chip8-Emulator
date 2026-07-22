@@ -21,7 +21,8 @@ class chip8
         chip8(void);
         bool Load_ROM(const char*);
         bool Cycle(void);
-        void Print_Memory(int);
+        void Print_Memory(const int, const int);
+        void Print_Registers(void);
         
     private:
         uint16_t pc = 0;
