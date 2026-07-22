@@ -4,7 +4,7 @@ const uint8_t FONT_SIZE = 80;
 const uint8_t FONT_START_ADDRESS = 0x050;
 const uint16_t ROM_START_ADDRESS = 0x200;
 
-chip8::chip8(void) //constructor
+chip8::chip8(void)
 {
     pc = ROM_START_ADDRESS;
 
@@ -39,26 +39,66 @@ int chip8::Load_ROM(const char* filename)
     if(!rom)
         return -1;
 
-    const std::streamsize ROM_SIZE = rom.tellg();
+    const uint16_t ROM_SIZE = rom.tellg();
     char* buffer = new char[ROM_SIZE];
 
 	rom.seekg(0, std::ios::beg);
-	rom.read(buffer, ROM_SIZE);
+	rom.read(buffer, static_cast<std::streamsize>(ROM_SIZE));
 	rom.close();
 
-	for (long i = 0; i < ROM_SIZE; i++)
-	{
+    if(ROM_SIZE > MEMORY_SIZE - ROM_START_ADDRESS || ROM_SIZE <= 0)
+        return -1;
+
+	for(long i = 0; i < ROM_SIZE; i++)
 		memory[ROM_START_ADDRESS + i] = buffer[i];
-	}
 
 	delete[] buffer;
 
     return 0;
 }
 
+void chip8::Fetch(void)
+{
+    if((pc + 1) > MEMORY_SIZE)
+    {
+        opcode = -1;
+        return;
+    }
+
+    uint16_t opcode = static_cast<uint16_t>(memory[pc]) << 8 | static_cast<uint16_t>(memory[pc + 1]);
+    
+    pc += 2;
+}
+
 void chip8::Cycle(void)
 {
-    //chip8::Fetch();
-    //chip8::Decode();
+    chip8::Fetch();
     //chip8::Execute();
+}
+
+void chip8::OP_00E0(void) //clear screen
+{
+    for(int i = 0; i < VIDEO_HEIGHT * VIDEO_WIDTH; i++)
+        video[i] = 0;
+}
+
+void chip8::OP_1NNN(void) //jump to NNN
+{
+    uint16_t jump_adress = opcode & 0x0111; 
+
+    pc = jump_adress;
+}
+
+void chip8::Print_Memory(int start)
+{
+    int aux = 0;
+
+    for(int i = start; i < MEMORY_SIZE; i++)
+    {
+        if(aux % 3 == 1)
+            std::cout << std::endl;
+
+        std::cout << static_cast<char>(memory[i]) << " ";
+        aux++;
+    }
 }

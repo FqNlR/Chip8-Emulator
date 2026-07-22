@@ -16,23 +16,24 @@ class chip8
     public:
         uint8_t keypad[16] = {};    
         bool video[VIDEO_HEIGHT * VIDEO_WIDTH] = {};
-        uint8_t memory[MEMORY_SIZE] = {};
-
+        
         chip8(void);
-        int Load_ROM(const char* filename);
+        int Load_ROM(const char*);
         void Cycle(void);
-
+        void Print_Memory(int);
+        
     private:
         uint16_t pc = 0;
-        uint8_t sp = 0;
         uint8_t delay_timer = 0;
         uint8_t sound_timer = 0;
         uint8_t registers[16] = {};
+        uint8_t memory[MEMORY_SIZE] = {};
         uint16_t index = 0;
         uint16_t opcode = 0;
-        std::stack<uint16_t> stk;
+        std::stack<uint16_t> stack;
 
         void Fetch(void);
-        void Decode(void);
         void Execute(void);
+        void OP_00E0(void); //clear screen
+        void OP_1NNN(void); //jump to NNN
 };

@@ -20,8 +20,7 @@ int main(int argc, char* argv[])
     }
     */
 
-    for(int i = 0x200; i < MEMORY_SIZE; i++) //print memory
-        std::cout << (char)chip.memory[i];
+    chip.Print_Memory(0);
 
     return 0;
 }
