@@ -98,7 +98,7 @@ void chip8::Print_Memory(int start)
     for(int i = start; i < MEMORY_SIZE; i++)
     {
         if(aux % 16 == 0)
-            cout << std::endl << "0x" << std::hex << std::setw(3) << std::setfill('0') << i << ": "; 
+            std::cout << std::endl << "0x" << std::hex << std::setw(3) << std::setfill('0') << i << ": "; 
 
         std::cout << std::setw(2) << std::setfill('0') << static_cast<int>(memory[i]) << ' ';
         aux++;
