@@ -254,12 +254,12 @@ void chip8::Print_Memory(const int start, const int end)
     std::cout << std::endl;
 }
 
-void chip8::Warning(const int error_type) //prints error message and stops execution
+void chip8::Warning(const int error_type) //prints error message and pauses execution
 {
     switch (error_type)
     {
         case 0:
-            std::cout << "\n\nUNKNOWN INSTRUCTION: " << std::setw(4) << std::setfill('0') << static_cast<int>(memory[pc]) << ' ';;
+            std::cout << "\n\nUNKNOWN INSTRUCTION: 0x" << std::hex << std::setw(4) << std::setfill('0') << static_cast<int>(opcode);
             break;
         case 1:
             std::cout << "\n\nSTACK ERROR!!!\n\n";

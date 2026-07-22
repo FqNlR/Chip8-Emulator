@@ -36,7 +36,7 @@ class chip8
 
         bool Fetch(void);
         void Execute(void);
-        void Warning(const int); //prints error message and stops execution
+        void Warning(const int); //prints error message and pauses execution
         void OP_00E0(void); //clear screen
         void OP_1NNN(void); //jump to NNN
         void OP_2NNN(void); //calls subroutine at NNN
