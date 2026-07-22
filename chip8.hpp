@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <iomanip>
 #include <cstdint>
 #include <fstream>
 #include <stack>
@@ -18,8 +19,8 @@ class chip8
         bool video[VIDEO_HEIGHT * VIDEO_WIDTH] = {};
         
         chip8(void);
-        int Load_ROM(const char*);
-        void Cycle(void);
+        bool Load_ROM(const char*);
+        bool Cycle(void);
         void Print_Memory(int);
         
     private:
@@ -32,7 +33,7 @@ class chip8
         uint16_t opcode = 0;
         std::stack<uint16_t> stack;
 
-        void Fetch(void);
+        bool Fetch(void);
         void Execute(void);
         void OP_00E0(void); //clear screen
         void OP_1NNN(void); //jump to NNN

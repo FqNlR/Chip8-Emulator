@@ -7,9 +7,8 @@ int main(int argc, char* argv[])
 
     chip8 chip;
 
-    if(chip.Load_ROM(argv[1]) != 0)
+    if(!chip.Load_ROM(argv[1]))
         return -1;
-        
         
     /*
     uint8_t current_instruction = 0;

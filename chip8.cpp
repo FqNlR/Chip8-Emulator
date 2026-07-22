@@ -32,48 +32,50 @@ chip8::chip8(void)
         memory[FONT_START_ADDRESS + i] = font[i];
 }
 
-int chip8::Load_ROM(const char* filename) 
+bool chip8::Load_ROM(const char* filename) 
 {
     std::fstream rom(filename, std::ios::binary | std::ios::in | std::ios::ate);
 
     if(!rom)
-        return -1;
+        return false;
 
     const uint16_t ROM_SIZE = rom.tellg();
+    
+    if(ROM_SIZE > MEMORY_SIZE - ROM_START_ADDRESS || ROM_SIZE <= 0)
+    {
+        rom.close();
+        return false;
+    }
+    
     char* buffer = new char[ROM_SIZE];
-
 	rom.seekg(0, std::ios::beg);
 	rom.read(buffer, static_cast<std::streamsize>(ROM_SIZE));
 	rom.close();
-
-    if(ROM_SIZE > MEMORY_SIZE - ROM_START_ADDRESS || ROM_SIZE <= 0)
-        return -1;
 
 	for(long i = 0; i < ROM_SIZE; i++)
 		memory[ROM_START_ADDRESS + i] = buffer[i];
 
 	delete[] buffer;
 
-    return 0;
+    return true;
 }
 
-void chip8::Fetch(void)
+bool chip8::Fetch(void)
 {
-    if((pc + 1) > MEMORY_SIZE)
-    {
-        opcode = -1;
-        return;
-    }
+    if(pc >= MEMORY_SIZE - 1)
+        return false;
 
-    uint16_t opcode = static_cast<uint16_t>(memory[pc]) << 8 | static_cast<uint16_t>(memory[pc + 1]);
-    
+    opcode = static_cast<uint16_t>(memory[pc]) << 8 | static_cast<uint16_t>(memory[pc + 1]);
     pc += 2;
+
+    return true;
 }
 
-void chip8::Cycle(void)
+bool chip8::Cycle(void)
 {
-    chip8::Fetch();
-    //chip8::Execute();
+    if(!Fetch())
+        return false;
+    Execute();
 }
 
 void chip8::OP_00E0(void) //clear screen
@@ -84,7 +86,7 @@ void chip8::OP_00E0(void) //clear screen
 
 void chip8::OP_1NNN(void) //jump to NNN
 {
-    uint16_t jump_adress = opcode & 0x0111; 
+    uint16_t jump_adress = opcode & 0x0FFF; // mask for 12 least significant bits
 
     pc = jump_adress;
 }
@@ -95,10 +97,10 @@ void chip8::Print_Memory(int start)
 
     for(int i = start; i < MEMORY_SIZE; i++)
     {
-        if(aux % 3 == 1)
-            std::cout << std::endl;
+        if(aux % 16 == 0)
+            cout << std::endl << "0x" << std::hex << std::setw(3) << std::setfill('0') << i << ": "; 
 
-        std::cout << static_cast<char>(memory[i]) << " ";
+        std::cout << std::setw(2) << std::setfill('0') << static_cast<int>(memory[i]) << ' ';
         aux++;
     }
 }
