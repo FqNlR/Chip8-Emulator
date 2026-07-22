@@ -73,7 +73,63 @@ bool chip8::Fetch(void)
 
 void chip8::Execute(void)
 {
+    switch(opcode & 0xF000) //decoding
+    {
+        case 0x0000:
+            if(opcode == 0x00E0)
+                OP_00E0();
+            else if(opcode == 0x00EE)
+                OP_00EE();
+            else
+                Warning(0);
+            break;
 
+        case 0x1000:
+            OP_1NNN();
+            break;
+
+        case 0x2000:
+            OP_2NNN();
+            break;
+
+        case 0x3000:
+            OP_3XNN();
+            break;
+
+        case 0x4000:
+            OP_4XNN();
+            break;
+
+        case 0x5000:
+            if((opcode & 0x000F) == 0)
+                OP_5XY0();
+            else
+                Warning(0);
+            break;
+
+        case 0x6000:
+            OP_6XNN();
+            break;
+
+        case 0x7000:
+            OP_7XNN();
+            break;
+
+        case 0x9000:
+            if((opcode & 0x000F) == 0)
+                OP_9XY0();
+            else
+                Warning(0);
+            break;
+
+        case 0xA000:
+            OP_ANNN();
+            break;
+        
+        default:
+            Warning(0);
+            break;
+    }
 }
 
 bool chip8::Cycle(void)
@@ -86,38 +142,82 @@ bool chip8::Cycle(void)
     return true;
 }
 
-void chip8::Print_Memory(int start)
-{
-    int aux = 0;
-
-    for(int i = start; i < MEMORY_SIZE; i++)
-    {
-        if(aux % 16 == 0)
-            std::cout << std::endl << "0x" << std::hex << std::setw(3) << std::setfill('0') << i << ": "; 
-
-        std::cout << std::setw(2) << std::setfill('0') << static_cast<int>(memory[i]) << ' ';
-        aux++;
-    }
-}
-
 void chip8::OP_00E0(void) //clear screen
 {
     for(int i = 0; i < VIDEO_HEIGHT * VIDEO_WIDTH; i++)
-        video[i] = 0;
+    video[i] = 0;
 }
 
 void chip8::OP_1NNN(void) //jump to NNN
 {
-    uint16_t jump_adress = opcode & 0x0FFF;
+    uint16_t jump_address = opcode & 0x0FFF;
+    
+    pc = jump_address;
+}
 
-    pc = jump_adress;
+void chip8::OP_2NNN(void) //calls subroutine at NNN
+{
+    uint16_t subroutine_address = opcode & 0x0FFF;
+    
+    stack.push(pc);
+    pc = subroutine_address;
+}
+
+void chip8::OP_00EE(void) //return from subroutine
+{
+    if(stack.empty())
+    {
+        std::cout << "\nSTACK EMPTY!" << "\nERROR!\n";
+        return;
+    }
+    
+    uint16_t return_address = stack.top();
+    stack.pop();
+    
+    pc = return_address;
+}
+
+void chip8::OP_3XNN(void) //skip one instruction if value in VX is equal to NN
+{
+    uint8_t reg_number = (opcode & 0x0F00) >> 8;
+    uint8_t value = opcode & 0x00FF;
+    
+    if(registers[reg_number] == value)
+    pc += 2;
+}
+
+void chip8::OP_4XNN(void) //skip one instruction if value in VX is NOT equal to NN
+{
+    uint8_t reg_number = (opcode & 0x0F00) >> 8;
+    uint8_t value = opcode & 0x00FF;
+    
+    if(registers[reg_number] != value)
+    pc += 2;
+}
+
+void chip8::OP_5XY0(void) //skip one instruction if value in VX is equal to value in VY
+{
+    uint8_t regx_number = (opcode & 0x0F00) >> 8;
+    uint8_t regy_number = (opcode & 0x00F0) >> 4;
+    
+    if(registers[regx_number] == registers[regy_number])
+    pc += 2;
+}
+
+void chip8::OP_9XY0(void) //skip one instruction if value in VX is NOT equal to value in VY
+{
+    uint8_t regx_number = (opcode & 0x0F00) >> 8;
+    uint8_t regy_number = (opcode & 0x00F0) >> 4;
+    
+    if(registers[regx_number] != registers[regy_number])
+    pc += 2;
 }
 
 void chip8::OP_6XNN(void) //set register VX to value NN
 {
     uint8_t reg_number = (opcode & 0x0F00) >> 8;
     uint8_t value = opcode & 0x00FF;
-
+    
     registers[reg_number] = value;
 }
 
@@ -125,13 +225,46 @@ void chip8::OP_7XNN(void) //add value NN to register VX
 {
     uint8_t reg_number = (opcode & 0x0F00) >> 8;
     uint8_t value = opcode & 0x00FF;
-
+    
     registers[reg_number] += value;
 }
 
 void chip8::OP_ANNN(void) //set index to value NNN
 {
     uint16_t value = opcode & 0x0FFF;
-
+    
     index = value;
+}
+
+void chip8::Print_Registers(void)
+{
+    std::cout << "registers: " << std::hex << static_cast<int>(registers[1]) << " index: " << static_cast<int>(index) <<
+    " pc: " << static_cast<int>(pc) << std::endl;
+}
+
+void chip8::Print_Memory(const int start, const int end)
+{
+    for(int i = start; i < end; i++)
+    {
+        if((i - start) % 16 == 0)
+            std::cout << std::endl << "0x" << std::hex << std::setw(3) << std::setfill('0') << i << ": "; 
+
+        std::cout << std::setw(2) << std::setfill('0') << static_cast<int>(memory[i]) << ' ';
+    }
+    std::cout << std::endl;
+}
+
+void chip8::Warning(const int error_type) //prints error message and pauses execution
+{
+    switch (error_type)
+    {
+        case 0:
+            std::cout << "\n\nUNKNOWN INSTRUCTION: 0x" << std::hex << std::setw(4) << std::setfill('0') << static_cast<int>(opcode);
+            break;
+        case 1:
+            std::cout << "\n\nSTACK ERROR!!!\n\n";
+            break;
+    }
+
+    system("pause");
 }
