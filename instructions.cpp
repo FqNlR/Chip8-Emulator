@@ -147,30 +147,34 @@ void chip8::OP_8XY5(void) //VX is set to result of VX - VY. affects VF
 {
     uint8_t regx_id = (opcode & 0x0F00) >> 8;
     uint8_t regy_id = (opcode & 0x00F0) >> 4;
+    uint8_t value_x = registers[regx_id];
+    uint8_t value_y = registers[regy_id];
 
-    uint16_t difference = registers[regx_id] - registers[regy_id];
+    uint16_t difference = value_x - value_y;
+    uint8_t borrow = 0;
     
-    registers[regx_id] = static_cast<uint8_t>(difference);
+    if(value_x >= value_y)
+        borrow = 1;
 
-    if(registers[regx_id] >= registers[regy_id])
-        registers[REGF_ID] = 1;
-    else
-        registers[REGF_ID] = 0;
+    registers[regx_id] = static_cast<uint8_t>(difference);
+    registers[REGF_ID] = borrow;
 }
 
 void chip8::OP_8XY7(void) //VX is set to result of VY - VX. affects VF
 {
     uint8_t regx_id = (opcode & 0x0F00) >> 8;
     uint8_t regy_id = (opcode & 0x00F0) >> 4;
+    uint8_t value_x = registers[regx_id];
+    uint8_t value_y = registers[regy_id];
 
-    uint16_t difference = registers[regy_id] - registers[regx_id];
+    uint16_t difference = value_y - value_x;
+    uint8_t borrow = 0;
     
+    if(value_x >= value_y)
+        borrow = 1;
+
     registers[regx_id] = static_cast<uint8_t>(difference);
-    
-    if(registers[regy_id] >= registers[regx_id])
-        registers[REGF_ID] = 1;
-    else
-        registers[REGF_ID] = 0;
+    registers[REGF_ID] = borrow;
 }
 
 void chip8::OP_8XY6(void) //may set the value of VX to the value of VY (--legacy flag) before rest of the operation.
