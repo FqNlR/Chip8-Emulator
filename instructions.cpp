@@ -170,7 +170,7 @@ void chip8::OP_8XY7(void) //VX is set to result of VY - VX. affects VF
     uint16_t difference = value_y - value_x;
     uint8_t borrow = 0;
     
-    if(value_x >= value_y)
+    if(value_y >= value_x)
         borrow = 1;
 
     registers[regx_id] = static_cast<uint8_t>(difference);
@@ -182,16 +182,18 @@ void chip8::OP_8XY6(void) //may set the value of VX to the value of VY (--legacy
 {
     uint8_t regx_id = (opcode & 0x0F00) >> 8;
     uint8_t regy_id = (opcode & 0x00F0) >> 4;
-
+    uint8_t shifted_bit = 0;
+    
     if(legacy_flag == true)
-        registers[regx_id] = registers[regy_id];
-        
-    if((registers[regx_id] & 0x01) == 1)
-        registers[REGF_ID] = 1;
-    else
-        registers[REGF_ID] = 0;
+    registers[regx_id] = registers[regy_id];
+    
+    uint8_t value_x = registers[regx_id];
+    
+    if((value_x & 0x01) == 1)
+        shifted_bit = 1;
 
-    registers[regx_id] = registers[regx_id] >> 1;
+    registers[regx_id] = value_x >> 1;
+    registers[REGF_ID] = shifted_bit;
 }
 
 void chip8::OP_8XYE(void) //may set the value of VX to the value of VY (--legacy flag) before rest of the operation.
@@ -199,14 +201,16 @@ void chip8::OP_8XYE(void) //may set the value of VX to the value of VY (--legacy
 {
     uint8_t regx_id = (opcode & 0x0F00) >> 8;
     uint8_t regy_id = (opcode & 0x00F0) >> 4;
-
+    uint8_t shifted_bit = 0;
+    
     if(legacy_flag == true)
-        registers[regx_id] = registers[regy_id];
-        
-    if((registers[regx_id] & 0x80) == 0x80)
-        registers[REGF_ID] = 1;
-    else
-        registers[REGF_ID] = 0;
+    registers[regx_id] = registers[regy_id];
+    
+    uint8_t value_x = registers[regx_id];
+    
+    if((value_x & 0x01) == 1)
+        shifted_bit = 1;
 
-    registers[regx_id] = registers[regx_id] << 1;
+    registers[regx_id] = value_x << 1;
+    registers[REGF_ID] = shifted_bit;
 }    
