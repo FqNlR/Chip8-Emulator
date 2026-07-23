@@ -135,12 +135,12 @@ void chip8::OP_8XY4(void) //VX is set to result of VX + VY. affects VF
 
     uint16_t sum = registers[regx_id] + registers[regy_id];
 
+    registers[regx_id] = static_cast<uint8_t>(sum);
+    
     if(sum > 255)
         registers[REGF_ID] = 1;
     else
         registers[REGF_ID] = 0;
-
-    registers[regx_id] = static_cast<uint8_t>(sum);
 }
 
 void chip8::OP_8XY5(void) //VX is set to result of VX - VY. affects VF
@@ -148,13 +148,14 @@ void chip8::OP_8XY5(void) //VX is set to result of VX - VY. affects VF
     uint8_t regx_id = (opcode & 0x0F00) >> 8;
     uint8_t regy_id = (opcode & 0x00F0) >> 4;
 
+    uint16_t difference = registers[regx_id] - registers[regy_id];
+    
+    registers[regx_id] = static_cast<uint8_t>(difference);
+
     if(registers[regx_id] >= registers[regy_id])
         registers[REGF_ID] = 1;
     else
         registers[REGF_ID] = 0;
-
-    uint16_t difference = registers[regx_id] - registers[regy_id];
-    registers[regx_id] = static_cast<uint8_t>(difference);
 }
 
 void chip8::OP_8XY7(void) //VX is set to result of VY - VX. affects VF
@@ -162,13 +163,14 @@ void chip8::OP_8XY7(void) //VX is set to result of VY - VX. affects VF
     uint8_t regx_id = (opcode & 0x0F00) >> 8;
     uint8_t regy_id = (opcode & 0x00F0) >> 4;
 
+    uint16_t difference = registers[regy_id] - registers[regx_id];
+    
+    registers[regx_id] = static_cast<uint8_t>(difference);
+    
     if(registers[regy_id] >= registers[regx_id])
         registers[REGF_ID] = 1;
     else
         registers[REGF_ID] = 0;
-
-    uint16_t difference = registers[regy_id] - registers[regx_id];
-    registers[regx_id] = static_cast<uint8_t>(difference);
 }
 
 void chip8::OP_8XY6(void) //may set the value of VX to the value of VY (--legacy flag) before rest of the operation.
@@ -197,7 +199,7 @@ void chip8::OP_8XYE(void) //may set the value of VX to the value of VY (--legacy
     if(legacy_flag == true)
         registers[regx_id] = registers[regy_id];
         
-    if((registers[regx_id] & 0x80) == 1)
+    if((registers[regx_id] & 0x80) == 0x80)
         registers[REGF_ID] = 1;
     else
         registers[REGF_ID] = 0;

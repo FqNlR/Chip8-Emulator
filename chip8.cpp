@@ -73,7 +73,7 @@ bool chip8::Fetch(void)
 
 void chip8::Execute(void)
 {
-    switch(opcode & 0xF000) //decoding
+    switch(opcode & 0xF000) //decoder
     {
         case 0x0000:
             if(opcode == 0x00E0)
@@ -113,6 +113,41 @@ void chip8::Execute(void)
 
         case 0x7000:
             OP_7XNN();
+            break;
+        
+        case 0x8000:
+            switch(opcode & 0x000F)
+            {
+                case 0x0000:
+                    OP_8XY0();
+                    break;
+                case 0x0001:
+                    OP_8XY1();
+                    break;
+                case 0x0002:
+                    OP_8XY2();
+                    break;
+                case 0x0003:
+                    OP_8XY3();
+                    break;
+                case 0x0004:
+                    OP_8XY4();
+                    break;
+                case 0x0005:
+                    OP_8XY5();
+                    break;
+                case 0x0006:
+                    OP_8XY6();
+                    break;
+                case 0x0007:
+                    OP_8XY7();
+                    break;
+                case 0x000E:
+                    OP_8XYE();
+                    break;
+                default:
+                    Warning(0);
+            }
             break;
 
         case 0x9000:
