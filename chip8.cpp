@@ -5,6 +5,8 @@ const uint8_t FONT_START_ADDRESS = 0x050;
 const uint16_t ROM_START_ADDRESS = 0x200;
 
 chip8::chip8(void) //constructor
+: rnd_generator(std::random_device{}()),
+  rnd_byte_dist(0, 255)
 {
     pc = ROM_START_ADDRESS;
 
@@ -160,6 +162,10 @@ void chip8::Execute(void)
         case 0xA000:
             OP_ANNN();
             break;
+
+        case 0xC000:
+            OP_CXNN();
+            break;
         
         default:
             Warning(0);
@@ -169,7 +175,7 @@ void chip8::Execute(void)
 
 bool chip8::Cycle(void)
 {
-    if(!Fetch())
+    if(!Fetch() || stop_execution_flag == true)
         return false;
     
     Execute();
@@ -177,10 +183,13 @@ bool chip8::Cycle(void)
     return true;
 }
 
-void chip8::Print_Registers(void)
+void chip8::Print_Registers(void) //prints all registers, pc and index
 {
-    std::cout << "registers: " << std::hex << static_cast<int>(registers[1]) << " index: " << static_cast<int>(index) <<
-    " pc: " << static_cast<int>(pc) << std::endl;
+    for(int i = 0; i < 16; i++)
+        std::cout << "register v" << i << ": " << std::hex << static_cast<int>(registers[i]) << std::endl;
+
+    std::cout << "index: " << static_cast<int>(index) <<
+    std::endl << "pc: " << static_cast<int>(pc) << std::endl;
 }
 
 void chip8::Print_Memory(const int start, const int end) //prints memory from start address to end adress
@@ -207,5 +216,5 @@ void chip8::Warning(const int error_type) //prints error message and pauses exec
             break;
     }
 
-    system("pause");
+    stop_execution_flag = true;
 }

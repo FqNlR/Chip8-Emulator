@@ -19,12 +19,13 @@ int main(int argc, char* argv[])
 
     for(int i = 0; i < atoi(argv[2]); i++)
     {
-        if(!chip.Cycle())
-            break;
         std::system("cls");
         chip.Print_Registers();
         chip.Print_Memory(0x0200, 0x0220);
         std::system("pause");
+        
+        if(!chip.Cycle())
+            break;
     }
 
     return 0;

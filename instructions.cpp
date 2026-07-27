@@ -89,13 +89,6 @@ void chip8::OP_7XNN(void) //add value NN to register VX
     registers[reg_id] += value;
 }
 
-void chip8::OP_ANNN(void) //set index to value NNN
-{
-    uint16_t value = opcode & 0x0FFF;
-    
-    index = value;
-}
-
 void chip8::OP_8XY0(void) //VX is set to the value of VY
 {
     uint8_t regx_id = (opcode & 0x0F00) >> 8;
@@ -213,4 +206,21 @@ void chip8::OP_8XYE(void) //may set the value of VX to the value of VY (--legacy
 
     registers[regx_id] = value_x << 1;
     registers[REGF_ID] = shifted_bit;
-}    
+}
+
+void chip8::OP_ANNN(void) //set index to value NNN
+{
+    uint16_t value = opcode & 0x0FFF;
+    
+    index = value;
+}
+
+void chip8::OP_CXNN(void) //VX is set to bitwise AND between NN and a random number
+{
+    uint8_t regx_id = (opcode & 0x0F00) >> 8;
+    uint8_t mask = opcode & 0x00FF;
+
+    uint8_t rnd = static_cast<uint8_t>(rnd_byte_dist(rnd_generator));
+
+    registers[regx_id] = rnd & mask;
+}
