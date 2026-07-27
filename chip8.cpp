@@ -41,26 +41,21 @@ bool chip8::Load_ROM(const char* filename)
     if(!rom)
         return false;
 
-    std::streampos ROM_SIZE = rom.tellg();
+    std::streampos file_pos = rom.tellg();
 
-    if(ROM_SIZE <= 0 || ROM_SIZE > static_cast<std::streampos>(MEMORY_SIZE - ROM_START_ADDRESS))
-    {
-        rom.close();
+    if(file_pos <= 0)
         return false;
-    }
     
-    char* buffer = new char[ROM_SIZE];
+    const std::streamsize ROM_SIZE = static_cast<std::streamsize>(file_pos);
+    const std::streamsize AVAILABLE_MEMORY = static_cast<std::streamsize>(MEMORY_SIZE - ROM_START_ADDRESS);
+
+    if(ROM_SIZE > AVAILABLE_MEMORY)
+        return false;
+
 	rom.seekg(0, std::ios::beg);
 	
-    if(!rom.read(buffer, static_cast<std::streamsize>(ROM_SIZE)))
+    if(!rom.read(reinterpret_cast<char*>(&memory[ROM_START_ADDRESS]), ROM_SIZE))
         return false;
-
-	rom.close();
-
-	for(long i = 0; i < ROM_SIZE; i++)
-		memory[ROM_START_ADDRESS + i] = buffer[i];
-
-	delete[] buffer;
 
     return true;
 }
@@ -178,12 +173,15 @@ void chip8::Execute(void)
 
 bool chip8::Cycle(void)
 {
-    if(stop_execution_flag == true || !Fetch())
+    if(!Fetch())
         return false;
     
     Execute();
 
-    return true;
+    if(stop_execution_flag == 0)
+        return true;
+    else
+        return false;
 }
 
 void chip8::Print_Registers(void) //prints all registers, pc and index
@@ -197,7 +195,7 @@ void chip8::Print_Registers(void) //prints all registers, pc and index
 
 void chip8::Print_Memory(const int start, const int end) //prints memory from start address to end adress
 {
-    if(start <= 0 || start >= MEMORY_SIZE - 2 || end <= 1 || end >= MEMORY_SIZE + 1)
+    if(start < 0 || start > MEMORY_SIZE || end > MEMORY_SIZE || end <= 0 || start > end)
     {
         Warning(2);
         return;
@@ -225,7 +223,7 @@ void chip8::Warning(const int error_type) //prints error message and pauses exec
             break;
         case 2:
             std::cout << "\n\nINVALID START OR END POINTS FOR MEMORY PRINT\n\n";
-            break;
+            return;
     }
 
     stop_execution_flag = true;
