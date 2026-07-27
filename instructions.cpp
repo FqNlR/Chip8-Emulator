@@ -208,7 +208,7 @@ void chip8::OP_8XYE(void) //may set the value of VX to the value of VY (--legacy
     
     uint8_t value_x = registers[regx_id];
     
-    if((value_x & 0x80) == 1)
+    if((value_x & 0x80) == 0x80)
         shifted_bit = 1;
 
     registers[regx_id] = value_x << 1;
