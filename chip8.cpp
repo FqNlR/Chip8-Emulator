@@ -175,7 +175,7 @@ void chip8::Execute(void)
 
 bool chip8::Cycle(void)
 {
-    if(!Fetch() || stop_execution_flag == true)
+    if(stop_execution_flag == true || !Fetch())
         return false;
     
     Execute();

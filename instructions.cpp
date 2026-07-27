@@ -27,7 +27,7 @@ void chip8::OP_00EE(void) //return from subroutine
 {
     if(stack.empty())
     {
-        std::cout << "\nSTACK EMPTY!" << "\nERROR!\n";
+        Warning(1);
         return;
     }
     
