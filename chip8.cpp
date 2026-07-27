@@ -225,6 +225,7 @@ void chip8::Warning(const int error_type) //prints error message and pauses exec
             break;
         case 2:
             std::cout << "\n\nINVALID START OR END POINTS FOR MEMORY PRINT\n\n";
+            break;
     }
 
     stop_execution_flag = true;
