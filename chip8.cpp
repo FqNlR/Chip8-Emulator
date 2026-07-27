@@ -173,15 +173,18 @@ void chip8::Execute(void)
 
 bool chip8::Cycle(void)
 {
+    if(stop_execution_flag == true)
+        return false;
+
     if(!Fetch())
         return false;
     
     Execute();
 
-    if(stop_execution_flag == 0)
-        return true;
-    else
+    if(stop_execution_flag == true)
         return false;
+    
+    return true;
 }
 
 void chip8::Print_Registers(void) //prints all registers, pc and index
@@ -195,7 +198,7 @@ void chip8::Print_Registers(void) //prints all registers, pc and index
 
 void chip8::Print_Memory(const int start, const int end) //prints memory from start address to end adress
 {
-    if(start < 0 || start > MEMORY_SIZE || end > MEMORY_SIZE || end <= 0 || start > end)
+    if(start < 0 || start >= MEMORY_SIZE || end <= start || end > MEMORY_SIZE)
     {
         Warning(2);
         return;
