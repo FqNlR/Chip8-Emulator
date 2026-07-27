@@ -5,8 +5,7 @@
 #include <cstdint>
 #include <fstream>
 #include <stack>
-#include <chrono>
-#include <thread>
+#include <random>
 
 const uint8_t VIDEO_HEIGHT = 32;
 const uint8_t VIDEO_WIDTH = 64;
@@ -17,6 +16,7 @@ class chip8
     public:
         uint8_t keypad[16] = {};    
         bool video[VIDEO_HEIGHT * VIDEO_WIDTH] = {};
+        bool legacy_flag = false;
         
         chip8(void);
         bool Load_ROM(const char*);
@@ -33,6 +33,9 @@ class chip8
         uint16_t index = 0;
         uint16_t opcode = 0;
         std::stack<uint16_t> stack;
+        bool stop_execution_flag = false;
+        std::mt19937 rnd_generator;
+        std::uniform_int_distribution<int> rnd_byte_dist;
 
         bool Fetch(void);
         void Execute(void);
@@ -47,5 +50,17 @@ class chip8
         void OP_9XY0(void); //skip one instruction if value in VX is NOT equal to value in VY
         void OP_6XNN(void); //set register VX to value NN
         void OP_7XNN(void); //add value NN to register VX
+        void OP_8XY0(void); //VX is set to the value of VY
+        void OP_8XY1(void); //VX is set to result of bitwise OR of VX and VY
+        void OP_8XY2(void); //VX is set to result of bitwise AND of VX and VY
+        void OP_8XY3(void); //VX is set to result of bitwise XOR of VX and VY
+        void OP_8XY4(void); //VX is set to result of VX + VY. affects VF
+        void OP_8XY5(void); //VX is set to result of VX - VY. affects VF
+        void OP_8XY7(void); //VX is set to result of VY - VX. affects VF
+        void OP_8XY6(void); //may set the value of VX to the value of VY (--legacy flag) before rest of the operation.
+                            //shifts the value of VX one bit to the right. affects VF based on the bit that was shifted
+        void OP_8XYE(void); //may set the value of VX to the value of VY (--legacy flag) before rest of the operation.
+                            //shifts the value of VX one bit to the left. affects VF based on the bit that was shifted
         void OP_ANNN(void); //set index to value NNN
+        void OP_CXNN(void); //VX is set to bitwise AND between NN and a random number
 };
