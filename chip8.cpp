@@ -41,9 +41,9 @@ bool chip8::Load_ROM(const char* filename)
     if(!rom)
         return false;
 
-    const uint16_t ROM_SIZE = rom.tellg();
-    
-    if(ROM_SIZE > MEMORY_SIZE - ROM_START_ADDRESS || ROM_SIZE <= 0)
+    std::streampos ROM_SIZE = rom.tellg();
+
+    if(ROM_SIZE <= 0 || ROM_SIZE > static_cast<std::streampos>(MEMORY_SIZE - ROM_START_ADDRESS))
     {
         rom.close();
         return false;
@@ -51,7 +51,10 @@ bool chip8::Load_ROM(const char* filename)
     
     char* buffer = new char[ROM_SIZE];
 	rom.seekg(0, std::ios::beg);
-	rom.read(buffer, static_cast<std::streamsize>(ROM_SIZE));
+	
+    if(!rom.read(buffer, static_cast<std::streamsize>(ROM_SIZE)))
+        return false;
+
 	rom.close();
 
 	for(long i = 0; i < ROM_SIZE; i++)
@@ -194,6 +197,12 @@ void chip8::Print_Registers(void) //prints all registers, pc and index
 
 void chip8::Print_Memory(const int start, const int end) //prints memory from start address to end adress
 {
+    if(start <= 0 || start >= MEMORY_SIZE - 2 || end <= 1 || end >= MEMORY_SIZE + 1)
+    {
+        Warning(2);
+        return;
+    }
+
     for(int i = start; i < end; i++)
     {
         if((i - start) % 16 == 0)
@@ -212,8 +221,10 @@ void chip8::Warning(const int error_type) //prints error message and pauses exec
             std::cout << "\n\nUNKNOWN INSTRUCTION: 0x" << std::hex << std::setw(4) << std::setfill('0') << static_cast<int>(opcode);
             break;
         case 1:
-            std::cout << "\n\nSTACK ERROR!!!\n\n";
+            std::cout << "\n\nSTACK ERROR\n\n";
             break;
+        case 2:
+            std::cout << "\n\nINVALID START OR END POINTS FOR MEMORY PRINT\n\n";
     }
 
     stop_execution_flag = true;
