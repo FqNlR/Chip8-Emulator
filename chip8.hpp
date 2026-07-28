@@ -43,16 +43,16 @@ class chip8
         bool Fetch(void);
         void Execute(void);
         void Warning(const int); //prints error message and pauses execution
-        void OP_00E0(void); //clear screen
-        void OP_1NNN(void); //jump to NNN
+        void OP_00E0(void); //clears screen
+        void OP_1NNN(void); //jumps to NNN
         void OP_2NNN(void); //calls subroutine at NNN
-        void OP_00EE(void); //return from subroutine
-        void OP_3XNN(void); //skip one instruction if value in VX is equal to NN
-        void OP_4XNN(void); //skip one instruction if value in VX is NOT equal to NN
-        void OP_5XY0(void); //skip one instruction if value in VX is equal to value in VY
-        void OP_9XY0(void); //skip one instruction if value in VX is NOT equal to value in VY
-        void OP_6XNN(void); //set register VX to value NN
-        void OP_7XNN(void); //add value NN to register VX
+        void OP_00EE(void); //returns from subroutine
+        void OP_3XNN(void); //skips one instruction if value in VX is equal to NN
+        void OP_4XNN(void); //skips one instruction if value in VX is NOT equal to NN
+        void OP_5XY0(void); //skips one instruction if value in VX is equal to value in VY
+        void OP_9XY0(void); //skips one instruction if value in VX is NOT equal to value in VY
+        void OP_6XNN(void); //sets register VX to value NN
+        void OP_7XNN(void); //adds value NN to register VX
         void OP_8XY0(void); //VX is set to the value of VY
         void OP_8XY1(void); //VX is set to result of bitwise OR of VX and VY
         void OP_8XY2(void); //VX is set to result of bitwise AND of VX and VY
@@ -64,8 +64,10 @@ class chip8
                             //shifts the value of VX one bit to the right. affects VF based on the bit that was shifted
         void OP_8XYE(void); //may set the value of VX to the value of VY (--vy_shift flag) before rest of the operation.
                             //shifts the value of VX one bit to the left. affects VF based on the bit that was shifted
-        void OP_ANNN(void); //set index to value NNN
-        void OP_BNNN(void); //set pc to address NNN + V0. if --vx_jump is enabled this instruction works more like BXNN,
+        void OP_ANNN(void); //sets index to value NNN
+        void OP_BNNN(void); //sets pc to address NNN + V0. if --vx_jump is enabled this instruction works more like BXNN,
                             //where pc is set to address XNN + VX.
         void OP_CXNN(void); //VX is set to bitwise AND between NN and a random number
+        void OP_DXYN(void); //draws N pixels tall sprite from memory location in index, at the horizontal X coordinate
+                            //represented by the value in VX and the Y coordinate in VY.
 };

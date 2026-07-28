@@ -169,6 +169,10 @@ void chip8::Execute(void)
             OP_CXNN();
             break;
         
+        case 0xD000:
+            OP_DXYN();
+            break;
+
         default:
             Warning(0);
             break;
@@ -233,6 +237,9 @@ void chip8::Warning(const int error_type) //prints error message and pauses exec
             return;
         case 3:
             std::cout << "\n\nINVALID JUMP INSTRUCTION\n\n";
+            break;
+        case 4:
+            std::cout << "\n\nINVALID INDEX IN DRAW FUNCTION\n\n";
             break;
     }
 

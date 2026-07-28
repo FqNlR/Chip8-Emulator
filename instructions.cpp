@@ -177,7 +177,7 @@ void chip8::OP_8XY6(void) //may set the value of VX to the value of VY (--legacy
     uint8_t regy_id = (opcode & 0x00F0) >> 4;
     uint8_t shifted_bit = 0;
     
-    if(vy_shift == true)
+    if(vy_shift)
     registers[regx_id] = registers[regy_id];
     
     uint8_t value_x = registers[regx_id];
@@ -196,7 +196,7 @@ void chip8::OP_8XYE(void) //may set the value of VX to the value of VY (--legacy
     uint8_t regy_id = (opcode & 0x00F0) >> 4;
     uint8_t shifted_bit = 0;
     
-    if(vy_shift == true)
+    if(vy_shift)
     registers[regx_id] = registers[regy_id];
     
     uint8_t value_x = registers[regx_id];
@@ -244,4 +244,57 @@ void chip8::OP_BNNN(void) //set pc to address NNN + V0. if --vx_jump is enabled 
     }
 
     pc = target;
+}
+
+void chip8::OP_DXYN(void) //draws N pixels tall sprite from memory location in index, at the horizontal X coordinate
+                          //represented by the value in VX and the Y coordinate in VY.
+{
+    uint8_t regx_id = (opcode & 0x0F00) >> 8;
+    uint8_t regy_id = (opcode & 0x00F0) >> 4;
+    uint8_t value_x = registers[regx_id] & 63;
+    uint8_t value_y = registers[regy_id] & 31;
+    uint8_t screen_x = 0;
+    uint8_t screen_y = 0;
+    uint8_t N = opcode & 0x000F;
+    bool stop_drawing = false;
+    registers[REGF_ID] = 0;
+    
+    for(int i = 0; i < N; i++)
+    {
+        if(index + i >= MEMORY_SIZE)
+        {
+            Warning(4);
+            return;
+        }
+
+        uint8_t sprite = memory[index + i];
+
+        for(int j = 0; j < 8; j++)
+        {
+            screen_x = value_x + j;
+            screen_y = value_y + i;
+            uint8_t bit = (sprite >> (7 - j)) & 0x0001;
+
+            if(screen_x >= VIDEO_WIDTH)
+                break;
+                
+            if(screen_y >= VIDEO_HEIGHT)
+            {
+                stop_drawing = true;
+                break;
+            }
+
+            if(bit == 1 && video[screen_y * VIDEO_WIDTH + screen_x] == 1)
+            {
+                video[screen_y * VIDEO_WIDTH + screen_x] = 0;
+                registers[REGF_ID] = 1;
+            }
+            else if(bit == 1 && video[screen_y * VIDEO_WIDTH + screen_x] == 0)
+                video[screen_y * VIDEO_WIDTH + screen_x] = 1;
+
+        }
+
+        if(stop_drawing == true)
+            break;
+    }
 }
