@@ -11,11 +11,17 @@ int main(int argc, char* argv[])
     if(!chip.Load_ROM(argv[1]))
         return -1;
     
-    if(strcmp(argv[3], "--vy_shift") == 0 || strcmp(argv[4], "--vy_shift") == 0)
-        chip.Set_Vy_Shift(true);
+    if(argc > 3)
+    {
+        for(int i = 3; i < argc; i++)
+        {
+            if(strcmp(argv[i], "--vy_shift") == 0)
+                chip.Set_Vy_Shift(true);
 
-    if(strcmp(argv[3], "--vx_jump") == 0 || strcmp(argv[4], "--vx_jump") == 0)
-        chip.Set_Vx_Jump(true);
+            if(strcmp(argv[i], "--vx_jump") == 0)
+                chip.Set_Vx_Jump(true);
+        }
+    }
 
     for(int i = 0; i < atoi(argv[2]); i++)
     {

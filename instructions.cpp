@@ -237,7 +237,7 @@ void chip8::OP_BNNN(void) //set pc to address NNN + V0. if --vx_jump is enabled 
     else
         target = address + registers[0];
 
-    if(target > MEMORY_SIZE)
+    if(target >= MEMORY_SIZE)
     {
         Warning(3);
         return;
@@ -253,14 +253,15 @@ void chip8::OP_DXYN(void) //draws N pixels tall sprite from memory location in i
     uint8_t regy_id = (opcode & 0x00F0) >> 4;
     uint8_t value_x = registers[regx_id] & 63;
     uint8_t value_y = registers[regy_id] & 31;
-    uint8_t screen_x = 0;
-    uint8_t screen_y = 0;
     uint8_t N = opcode & 0x000F;
     bool stop_drawing = false;
     registers[REGF_ID] = 0;
     
     for(int i = 0; i < N; i++)
     {
+        uint8_t screen_x = 0;
+        uint8_t screen_y = 0;
+
         if(index + i >= MEMORY_SIZE)
         {
             Warning(4);
@@ -294,7 +295,7 @@ void chip8::OP_DXYN(void) //draws N pixels tall sprite from memory location in i
 
         }
 
-        if(stop_drawing == true)
+        if(stop_drawing)
             break;
     }
 }
