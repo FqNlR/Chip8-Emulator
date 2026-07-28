@@ -177,7 +177,7 @@ void chip8::OP_8XY6(void) //may set the value of VX to the value of VY (--legacy
     uint8_t regy_id = (opcode & 0x00F0) >> 4;
     uint8_t shifted_bit = 0;
     
-    if(legacy_flag == true)
+    if(vy_shift == true)
     registers[regx_id] = registers[regy_id];
     
     uint8_t value_x = registers[regx_id];
@@ -196,7 +196,7 @@ void chip8::OP_8XYE(void) //may set the value of VX to the value of VY (--legacy
     uint8_t regy_id = (opcode & 0x00F0) >> 4;
     uint8_t shifted_bit = 0;
     
-    if(legacy_flag == true)
+    if(vy_shift == true)
     registers[regx_id] = registers[regy_id];
     
     uint8_t value_x = registers[regx_id];
@@ -223,4 +223,25 @@ void chip8::OP_CXNN(void) //VX is set to bitwise AND between NN and a random num
     uint8_t rnd = static_cast<uint8_t>(rnd_byte_dist(rnd_generator));
 
     registers[regx_id] = rnd & mask;
+}
+
+void chip8::OP_BNNN(void) //set pc to address NNN + V0. if --vx_jump is enabled this instruction works more like BXNN,
+                          //where pc is set to address XNN + VX.
+{
+    uint16_t address = opcode & 0x0FFF;
+    uint8_t regx_id = (opcode & 0x0F00) >> 8;
+    uint16_t target = 0;
+
+    if(vx_jump)
+        target = address + registers[regx_id];
+    else
+        target = address + registers[0];
+
+    if(target > MEMORY_SIZE)
+    {
+        Warning(3);
+        return;
+    }
+
+    pc = target;
 }

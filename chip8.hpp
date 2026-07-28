@@ -16,13 +16,14 @@ class chip8
     public:
         uint8_t keypad[16] = {};    
         bool video[VIDEO_HEIGHT * VIDEO_WIDTH] = {};
-        bool legacy_flag = false;
         
         chip8(void);
         bool Load_ROM(const char*);
         bool Cycle(void);
         void Print_Memory(const int, const int);
         void Print_Registers(void);
+        void Set_Vy_Shift(bool);
+        void Set_Vx_Jump(bool);
         
     private:
         uint16_t pc = 0;
@@ -33,10 +34,12 @@ class chip8
         uint16_t index = 0;
         uint16_t opcode = 0;
         std::stack<uint16_t> stack;
-        bool stop_execution_flag = false;
         std::mt19937 rnd_generator;
         std::uniform_int_distribution<int> rnd_byte_dist;
-
+        bool stop_execution_flag = false;
+        bool vy_shift = false;
+        bool vx_jump = false;
+        
         bool Fetch(void);
         void Execute(void);
         void Warning(const int); //prints error message and pauses execution
@@ -57,10 +60,12 @@ class chip8
         void OP_8XY4(void); //VX is set to result of VX + VY. affects VF
         void OP_8XY5(void); //VX is set to result of VX - VY. affects VF
         void OP_8XY7(void); //VX is set to result of VY - VX. affects VF
-        void OP_8XY6(void); //may set the value of VX to the value of VY (--legacy flag) before rest of the operation.
+        void OP_8XY6(void); //may set the value of VX to the value of VY (--vy_shift flag) before rest of the operation.
                             //shifts the value of VX one bit to the right. affects VF based on the bit that was shifted
-        void OP_8XYE(void); //may set the value of VX to the value of VY (--legacy flag) before rest of the operation.
+        void OP_8XYE(void); //may set the value of VX to the value of VY (--vy_shift flag) before rest of the operation.
                             //shifts the value of VX one bit to the left. affects VF based on the bit that was shifted
         void OP_ANNN(void); //set index to value NNN
+        void OP_BNNN(void); //set pc to address NNN + V0. if --vx_jump is enabled this instruction works more like BXNN,
+                            //where pc is set to address XNN + VX.
         void OP_CXNN(void); //VX is set to bitwise AND between NN and a random number
 };

@@ -231,3 +231,13 @@ void chip8::Warning(const int error_type) //prints error message and pauses exec
 
     stop_execution_flag = true;
 }
+
+void chip8::Set_Vy_Shift(bool set)
+{
+    vy_shift = set;
+}
+
+void chip8::Set_Vx_Jump(bool set)
+{
+    vx_jump = set;
+}
