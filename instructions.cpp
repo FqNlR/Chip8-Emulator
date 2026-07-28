@@ -259,9 +259,6 @@ void chip8::OP_DXYN(void) //draws N pixels tall sprite from memory location in i
     
     for(int i = 0; i < N; i++)
     {
-        uint8_t screen_x = 0;
-        uint8_t screen_y = 0;
-
         if(index + i >= MEMORY_SIZE)
         {
             Warning(4);
@@ -272,8 +269,8 @@ void chip8::OP_DXYN(void) //draws N pixels tall sprite from memory location in i
 
         for(int j = 0; j < 8; j++)
         {
-            screen_x = value_x + j;
-            screen_y = value_y + i;
+            uint8_t screen_x = value_x + j;
+            uint8_t screen_y = value_y + i;
             uint8_t bit = (sprite >> (7 - j)) & 0x0001;
 
             if(screen_x >= VIDEO_WIDTH)
