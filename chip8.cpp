@@ -161,6 +161,10 @@ void chip8::Execute(void)
             OP_ANNN();
             break;
 
+        case 0xB000:
+            OP_BNNN();
+            break;
+
         case 0xC000:
             OP_CXNN();
             break;
@@ -173,7 +177,7 @@ void chip8::Execute(void)
 
 bool chip8::Cycle(void)
 {
-    if(stop_execution_flag == true)
+    if(stop_execution_flag)
         return false;
 
     if(!Fetch())
@@ -181,7 +185,7 @@ bool chip8::Cycle(void)
     
     Execute();
 
-    if(stop_execution_flag == true)
+    if(stop_execution_flag)
         return false;
     
     return true;
@@ -227,6 +231,9 @@ void chip8::Warning(const int error_type) //prints error message and pauses exec
         case 2:
             std::cout << "\n\nINVALID START OR END POINTS FOR MEMORY PRINT\n\n";
             return;
+        case 3:
+            std::cout << "\n\nINVALID JUMP INSTRUCTION\n\n";
+            break;
     }
 
     stop_execution_flag = true;
