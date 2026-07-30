@@ -195,6 +195,14 @@ bool chip8::Cycle(void)
     return true;
 }
 
+void chip8::Update_Timers(void)
+{
+    if(delay_timer > 0)
+        delay_timer--;
+    if(sound_timer > 0)
+        sound_timer--;
+}
+
 void chip8::Print_Registers(void) //prints all registers, pc and index
 {
     for(int i = 0; i < 16; i++)

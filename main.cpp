@@ -1,5 +1,11 @@
 #include "chip8.hpp"
+#include "include/raylib.h"
 #include <cstring>
+
+const int SCALE = 15;
+const int WINDOW_HEIGHT = VIDEO_HEIGHT * SCALE;
+const int WINDOW_WIDTH = VIDEO_WIDTH * SCALE;
+const int FPS = 60;
 
 int main(int argc, char* argv[])
 {
@@ -23,16 +29,37 @@ int main(int argc, char* argv[])
         }
     }
 
-    for(int i = 0; i < atoi(argv[2]); i++)
+    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "chip8");
+    SetTargetFPS(FPS);
+
+    const int CPS = atoi(argv[2]); //gets cycles per frame from command line input
+
+    while(!WindowShouldClose())
     {
-        std::system("cls");
-        chip.Print_Registers();
-        chip.Print_Memory(0x0200, 0x0220);
-        std::system("pause");
-        
-        if(!chip.Cycle())
-            break;
+        for(int i = 0; i < CPS; i++)
+            chip.Cycle();
+
+        BeginDrawing();
+        ClearBackground(BLACK);
+        for(int i = 0; i < VIDEO_HEIGHT; i++)
+        {
+            for(int j = 0; j < VIDEO_WIDTH; j++)
+            {
+                if(chip.video[i * VIDEO_WIDTH + j] == 1)
+                    DrawRectangle(j * SCALE, i * SCALE, SCALE, SCALE, WHITE);
+            }
+        }
+        EndDrawing();
+
+        chip.Update_Timers();
     }
+
+    CloseWindow();
+
+    std::system("cls");
+    chip.Print_Registers();
+    chip.Print_Memory(0x0200, 0x0220);
+    std::system("pause");
 
     return 0;
 }

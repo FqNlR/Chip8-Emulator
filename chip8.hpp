@@ -20,6 +20,7 @@ class chip8
         chip8(void);
         bool Load_ROM(const char*);
         bool Cycle(void);
+        void Update_Timers(void);
         void Print_Memory(const int, const int);
         void Print_Registers(void);
         void Set_Vy_Shift(bool);
