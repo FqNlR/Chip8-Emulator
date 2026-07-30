@@ -1,4 +1,5 @@
 *.exe
 *.ch8
+*.txt
 /include/
 /lib/
