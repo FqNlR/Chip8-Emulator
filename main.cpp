@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
 
     std::system("cls");
     chip.Print_Registers();
-    chip.Print_Memory(0x0200, 0x0220);
+    //chip.Print_Memory(0x0200, 0x0220);
     std::system("pause");
 
     return 0;

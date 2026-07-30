@@ -4,7 +4,7 @@
 #include <iomanip>
 #include <cstdint>
 #include <fstream>
-#include <stack>
+#include <array>
 #include <random>
 
 const uint8_t VIDEO_HEIGHT = 32;
@@ -34,7 +34,8 @@ class chip8
         uint8_t memory[MEMORY_SIZE] = {};
         uint16_t index = 0;
         uint16_t opcode = 0;
-        std::stack<uint16_t> stack;
+        uint8_t sp = 0;
+        std::array<uint16_t, 16> stack;
         std::mt19937 rnd_generator;
         std::uniform_int_distribution<int> rnd_byte_dist;
         bool stop_execution_flag = false;

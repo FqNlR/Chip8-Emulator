@@ -19,22 +19,27 @@ void chip8::OP_2NNN(void) //calls subroutine at NNN
 {
     uint16_t subroutine_address = opcode & 0x0FFF;
     
-    stack.push(pc);
+    if(sp >= stack.size())
+    {
+        Warning(1);
+        return;
+    }        
+
+    stack[sp] = pc;
+    sp++;
     pc = subroutine_address;
 }
 
 void chip8::OP_00EE(void) //return from subroutine
 {
-    if(stack.empty())
+    if(sp == 0)
     {
         Warning(1);
         return;
     }
     
-    uint16_t return_address = stack.top();
-    stack.pop();
-    
-    pc = return_address;
+    sp--; 
+    pc = stack[sp];
 }
 
 void chip8::OP_3XNN(void) //skip one instruction if value in VX is equal to NN
