@@ -3,9 +3,10 @@
 
 int main(int argc, char* argv[])
 {
-    if(argc < 3 || argc > 6)
+    if(argc < 3 || argc > 7)
     {
-        std::cout << "Usage: chip8.exe [ROM_NAME] [CHIP-8 CYCLES PER FRAME] [--vy_shift --vx_jump]" << std::endl;
+        std::cout << "Usage: chip8.exe [ROM_NAME] [CHIP-8 CYCLES PER FRAME] " << 
+        "[--vy_shift --vx_jump --legacy_indexing --fx1e_treats_ov]" << std::endl;
         return -1;
     }
     
@@ -36,6 +37,9 @@ int main(int argc, char* argv[])
             
             if(strcmp(argv[i], "--legacy_indexing") == 0)
                 chip.Set_Legacy_Indexing(true);
+            
+            if(strcmp(argv[i], "--fx1e_treats_ov") == 0)
+                chip.Set_FX1E_Treats_OV(true);
         }
     }
 
@@ -45,13 +49,13 @@ int main(int argc, char* argv[])
     bool emulation_running = true;
     while(!WindowShouldClose())
     {
-        if(emulation_running)
+        for(int key = 0; key < 16; key++)
+            chip.Set_KeyPad(key, IsKeyDown(KEYMAP[key]));
+        
+            if(emulation_running)
         {
             for(int i = 0; i < CYCLES_PER_FRAME; i++)
             {
-                for(int key = 0; key < 16; key++)
-                    chip.Set_KeyPad(key, IsKeyDown(KEYMAP[key]));
-
                 if(!chip.Cycle())
                 {
                     emulation_running = false;

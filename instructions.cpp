@@ -355,27 +355,46 @@ void chip8::OP_FX0A(void) //waits for keypad input and then sets VX to input val
 {
     uint8_t regx_id = (opcode & 0x0F00) >> 8;
 
-    for(int key = 0; key < 16; key++)
+    if (!waiting_key_release)
     {
-        if(keypad[key])
+        for (int key = 0; key < 16; key++)
         {
-            registers[regx_id] = static_cast<uint8_t>(key);
-            return;
+            if (keypad[key])
+            {
+                waiting_key = static_cast<uint8_t>(key);
+                waiting_key_release = true;
+
+                pc -= 2;
+                return;
+            }
         }
+
+        pc -= 2;
+        return;
     }
 
-    pc -= 2;
+    if (keypad[waiting_key])
+    {
+        pc -= 2;
+        return;
+    }
+
+    registers[regx_id] = waiting_key;
+    waiting_key_release = false;
 }
 
 void chip8::OP_FX1E(void) //adds value of VX to index. sets VF to 1 if value overflows
 {
     uint8_t regx_id = (opcode & 0x0F00) >> 8;
 
-    if(index + registers[regx_id] >= MEMORY_SIZE)
-        registers[REGF_ID] = 1;
-    else
-        registers[REGF_ID] = 0;
-
+    if(fx1e_treats_ov)
+    {
+        if(index + registers[regx_id] >= MEMORY_SIZE)
+            registers[REGF_ID] = 1;
+        else
+            registers[REGF_ID] = 0;
+    }
+    
     index += registers[regx_id];
 }
 

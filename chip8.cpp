@@ -326,6 +326,11 @@ void chip8::Set_Legacy_Indexing(bool set)
     legacy_indexing = set;
 }
 
+void chip8::Set_FX1E_Treats_OV(bool set)
+{
+    fx1e_treats_ov = set;
+}
+
 void chip8::Set_KeyPad(const int key, bool state)
 {
     if(key >= 0 && key < 16)
