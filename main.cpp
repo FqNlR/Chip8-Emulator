@@ -74,13 +74,13 @@ int main(int argc, char* argv[])
         Update_Beeper(beep_stream, chip.Is_Sound_Active());
 
         BeginDrawing();
-        ClearBackground(BLACK);
+        ClearBackground(BLUE);
         for(int i = 0; i < VIDEO_HEIGHT; i++)
         {
             for(int j = 0; j < VIDEO_WIDTH; j++)
             {
                 if(chip.video[i * VIDEO_WIDTH + j] == 1)
-                    DrawRectangle(j * SCALE, i * SCALE, SCALE, SCALE, WHITE);
+                    DrawRectangle(j * SCALE, i * SCALE, SCALE, SCALE, DARKBLUE);
             }
         }
         EndDrawing();

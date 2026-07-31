@@ -395,16 +395,13 @@ void chip8::OP_FX0A(void) //waits for keypad input and then sets VX to input val
 void chip8::OP_FX1E(void) //adds value of VX to index. sets VF to 1 if value overflows
 {
     uint8_t regx_id = (opcode & 0x0F00) >> 8;
-    
-    index += registers[regx_id];
+    uint8_t value_x = registers[regx_id];
+    uint16_t result = index + value_x;
 
-    if(fx1e_sets_ov)
-    {
-        if(index + registers[regx_id] >= MEMORY_SIZE)
-            registers[REGF_ID] = 1;
-        else
-            registers[REGF_ID] = 0;
-    }
+    index = result;
+
+    if (fx1e_sets_ov)
+        registers[REGF_ID] = result >= MEMORY_SIZE;
 }
 
 void chip8::OP_FX29(void) //sets index to address of hex character in VX
