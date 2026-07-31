@@ -322,3 +322,47 @@ void chip8::OP_FX18(void) //sound timer is set to value of VX
 
     sound_timer = registers[regx_id];
 }
+
+void chip8::OP_EX9E(void) //skips one instruction if the key corresponding to value of VX is pressed
+{
+    uint8_t regx_id = (opcode & 0x0F00) >> 8;
+    uint8_t key = 0;
+
+    if(registers[regx_id] < 16)
+        key = registers[regx_id];
+    else
+        return;
+
+    if(keypad[key])
+        pc += 2;
+}
+
+void chip8::OP_EXA1(void) //skips one instruction if the key corresponding to value of VX is not pressed
+{
+    uint8_t regx_id = (opcode & 0x0F00) >> 8;
+    uint8_t key = 0;
+
+    if(registers[regx_id] < 16)
+        key = registers[regx_id];
+    else
+        return;
+
+    if(!keypad[key])
+        pc += 2;
+}
+
+void chip8::OP_FX0A(void) //waits for keypad input and then sets VX to input value
+{
+    uint8_t regx_id = (opcode & 0x0F00) >> 8;
+
+    for(int key = 0; key < 16; key++)
+    {
+        if(keypad[key])
+        {
+            registers[regx_id] = static_cast<int>(key);
+            return;
+        }
+    }
+
+    pc -= 2;
+}

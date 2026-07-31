@@ -1,9 +1,7 @@
 #pragma once
 
 #include <iostream>
-#include <iomanip>
 #include <cstdint>
-#include <fstream>
 #include <array>
 #include <random>
 
@@ -14,7 +12,7 @@ const uint16_t MEMORY_SIZE = 4096;
 class chip8
 {
     public:
-        uint8_t keypad[16] = {};    
+        
         bool video[VIDEO_HEIGHT * VIDEO_WIDTH] = {};
         
         chip8(void);
@@ -25,17 +23,19 @@ class chip8
         void Print_Registers(void);
         void Set_Vy_Shift(bool);
         void Set_Vx_Jump(bool);
+        void Set_KeyPad(const int, bool);
         
     private:
         uint16_t pc = 0;
         uint8_t delay_timer = 0;
         uint8_t sound_timer = 0;
+        uint8_t keypad[16] = {};
         uint8_t registers[16] = {};
         uint8_t memory[MEMORY_SIZE] = {};
         uint16_t index = 0;
         uint16_t opcode = 0;
         uint8_t sp = 0;
-        std::array<uint16_t, 16> stack;
+        std::array<uint16_t, 16> stack = {};
         std::mt19937 rnd_generator;
         std::uniform_int_distribution<int> rnd_byte_dist;
         bool stop_execution_flag = false;
@@ -75,4 +75,7 @@ class chip8
         void OP_FX07(void); //VX is set to value of the delay timer
         void OP_FX15(void); //delay timer is set to value of VX 
         void OP_FX18(void); //sound timer is set to value of VX
+        void OP_EX9E(void); //skips one instruction if the key corresponding to value of VX is pressed
+        void OP_EXA1(void); //skips one instruction if the key corresponding to value of VX is not pressed
+        void OP_FX0A(void); //waits for keypad input and then sets VX to input value
 };

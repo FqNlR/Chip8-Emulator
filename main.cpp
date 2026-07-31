@@ -1,21 +1,28 @@
 #include "chip8.hpp"
-#include "include/raylib.h"
-#include <cstring>
-
-const int SCALE = 15;
-const int WINDOW_HEIGHT = VIDEO_HEIGHT * SCALE;
-const int WINDOW_WIDTH = VIDEO_WIDTH * SCALE;
-const int FPS = 60;
+#include "main.hpp"
 
 int main(int argc, char* argv[])
 {
     if(argc < 3 || argc > 5)
+    {
+        std::cout << "Usage: chip8.exe [ROM_NAME] [CHIP-8 CYCLES PER SECOND] [--vy_shift --vx_jump]" << std::endl;
         return -1;
+    }
+    
+    const int CYCLES_PER_FRAME = atoi(argv[2]);
+    if(CYCLES_PER_FRAME <= 0)
+    {
+        std::cout << "ERROR: Cycles per second must be equal to or greater than 1" << std::endl;
+        return -1;
+    }   
 
     chip8 chip;
 
     if(!chip.Load_ROM(argv[1]))
+    {
+        std::cout << "ERROR: Could not load ROM into memory" << std::endl;
         return -1;
+    }
     
     if(argc > 3)
     {
@@ -32,12 +39,23 @@ int main(int argc, char* argv[])
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "chip8");
     SetTargetFPS(FPS);
 
-    const int CPS = atoi(argv[2]); //gets cycles per frame from command line input
-
+    bool emulation_running = true;
     while(!WindowShouldClose())
     {
-        for(int i = 0; i < CPS; i++)
-            chip.Cycle();
+        if(emulation_running)
+        {
+            for(int i = 0; i < CYCLES_PER_FRAME; i++)
+            {
+                for(int key = 0; key < 16; key++)
+                    chip.Set_KeyPad(key, IsKeyDown(KEYMAP[key]));
+
+                if(!chip.Cycle())
+                {
+                    emulation_running = false;
+                    break;
+                }
+            }    
+        }
 
         BeginDrawing();
         ClearBackground(BLACK);

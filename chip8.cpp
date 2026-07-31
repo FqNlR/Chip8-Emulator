@@ -1,4 +1,6 @@
 #include "chip8.hpp"
+#include <iomanip>
+#include <fstream>
 
 const uint8_t FONT_SIZE = 80;
 const uint8_t FONT_START_ADDRESS = 0x050;
@@ -188,10 +190,23 @@ void chip8::Execute(void)
                     OP_FX18();
                     break;
 
+                case 0x000A:
+                    OP_FX0A();
+                    break;
+
                 default:
                     Warning(0);
                     break;
             }
+            break;
+
+        case 0xE000:
+            if((opcode & 0x00FF) == 0x009E)
+                OP_EX9E();
+            else if((opcode & 0x00FF) == 0x00A1)
+                OP_EXA1();
+            else
+                Warning(0);
             break;
 
         default:
@@ -230,7 +245,9 @@ void chip8::Print_Registers(void) //prints all registers, pc and index
         std::cout << "register v" << i << ": " << std::hex << static_cast<int>(registers[i]) << std::endl;
 
     std::cout << "index: " << static_cast<int>(index) <<
-    std::endl << "pc: " << static_cast<int>(pc) << std::endl;
+    std::endl << "pc: " << static_cast<int>(pc) << 
+    std::endl << "delay timer: " << static_cast<int>(delay_timer) <<
+    std::endl << "sound timer: " << static_cast<int>(sound_timer) << std::endl;
 }
 
 void chip8::Print_Memory(const int start, const int end) //prints memory from start address to end adress
@@ -251,7 +268,7 @@ void chip8::Print_Memory(const int start, const int end) //prints memory from st
     std::cout << std::endl;
 }
 
-void chip8::Warning(const int error_type) //prints error message and pauses execution
+void chip8::Warning(const int error_type) //prints error message and stops execution
 {
     switch (error_type)
     {
@@ -283,4 +300,10 @@ void chip8::Set_Vy_Shift(bool set)
 void chip8::Set_Vx_Jump(bool set)
 {
     vx_jump = set;
+}
+
+void chip8::Set_KeyPad(const int key, bool state)
+{
+    if(key >= 0 && key < 16)
+        keypad[key] = state;
 }
