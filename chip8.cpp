@@ -1,8 +1,6 @@
 #include "chip8.hpp"
-
-const uint8_t FONT_SIZE = 80;
-const uint8_t FONT_START_ADDRESS = 0x050;
-const uint16_t ROM_START_ADDRESS = 0x200;
+#include <iomanip>
+#include <fstream>
 
 chip8::chip8(void) //constructor
 : rnd_generator(std::random_device{}()),
@@ -161,10 +159,72 @@ void chip8::Execute(void)
             OP_ANNN();
             break;
 
+        case 0xB000:
+            OP_BNNN();
+            break;
+
         case 0xC000:
             OP_CXNN();
             break;
         
+        case 0xD000:
+            OP_DXYN();
+            break;
+
+        case 0xF000:
+            switch (opcode & 0x00FF)
+            {
+                case 0x0007:
+                    OP_FX07();
+                    break;
+            
+                case 0x0015:
+                    OP_FX15();
+                    break;
+                
+                case 0x0018:
+                    OP_FX18();
+                    break;
+
+                case 0x000A:
+                    OP_FX0A();
+                    break;
+
+                case 0x001E:
+                    OP_FX1E();
+                    break;
+
+                case 0x0029:
+                    OP_FX29();
+                    break;
+
+                case 0x0033:
+                    OP_FX33();
+                    break;
+
+                case 0x0055:
+                    OP_FX55();
+                    break;
+
+                case 0x0065:
+                    OP_FX65();
+                    break;
+
+                default:
+                    Warning(0);
+                    break;
+            }
+            break;
+
+        case 0xE000:
+            if((opcode & 0x00FF) == 0x009E)
+                OP_EX9E();
+            else if((opcode & 0x00FF) == 0x00A1)
+                OP_EXA1();
+            else
+                Warning(0);
+            break;
+
         default:
             Warning(0);
             break;
@@ -173,7 +233,7 @@ void chip8::Execute(void)
 
 bool chip8::Cycle(void)
 {
-    if(stop_execution_flag == true)
+    if(stop_execution_flag)
         return false;
 
     if(!Fetch())
@@ -181,10 +241,18 @@ bool chip8::Cycle(void)
     
     Execute();
 
-    if(stop_execution_flag == true)
+    if(stop_execution_flag)
         return false;
     
     return true;
+}
+
+void chip8::Update_Timers(void)
+{
+    if(delay_timer > 0)
+        delay_timer--;
+    if(sound_timer > 0)
+        sound_timer--;
 }
 
 void chip8::Print_Registers(void) //prints all registers, pc and index
@@ -193,7 +261,9 @@ void chip8::Print_Registers(void) //prints all registers, pc and index
         std::cout << "register v" << i << ": " << std::hex << static_cast<int>(registers[i]) << std::endl;
 
     std::cout << "index: " << static_cast<int>(index) <<
-    std::endl << "pc: " << static_cast<int>(pc) << std::endl;
+    std::endl << "pc: " << static_cast<int>(pc) << 
+    std::endl << "delay timer: " << static_cast<int>(delay_timer) <<
+    std::endl << "sound timer: " << static_cast<int>(sound_timer) << std::endl;
 }
 
 void chip8::Print_Memory(const int start, const int end) //prints memory from start address to end adress
@@ -214,7 +284,7 @@ void chip8::Print_Memory(const int start, const int end) //prints memory from st
     std::cout << std::endl;
 }
 
-void chip8::Warning(const int error_type) //prints error message and pauses execution
+void chip8::Warning(const int error_type) //prints error message and stops execution
 {
     switch (error_type)
     {
@@ -227,7 +297,49 @@ void chip8::Warning(const int error_type) //prints error message and pauses exec
         case 2:
             std::cout << "\n\nINVALID START OR END POINTS FOR MEMORY PRINT\n\n";
             return;
+        case 3:
+            std::cout << "\n\nINVALID JUMP INSTRUCTION\n\n";
+            break;
+        case 4:
+            std::cout << "\n\nINVALID INDEX\n\n";
+            break;
     }
 
     stop_execution_flag = true;
+}
+
+void chip8::Set_Vy_Shift(bool set)
+{
+    vy_shift = set;
+}
+
+void chip8::Set_Vx_Jump(bool set)
+{
+    vx_jump = set;
+}
+
+void chip8::Set_Legacy_Indexing(bool set)
+{
+    legacy_indexing = set;
+}
+
+void chip8::Set_FX1E_Sets_OV(bool set)
+{
+    fx1e_sets_ov = set;
+}
+
+void chip8::Set_Logic_Resets_VF(bool set)
+{
+    logic_resets_vf = set;
+}
+
+void chip8::Set_KeyPad(const int key, bool state)
+{
+    if(key >= 0 && key < 16)
+        keypad[key] = state;
+}
+
+bool chip8::Is_Sound_Active(void)
+{
+    return sound_timer > 0;
 }
