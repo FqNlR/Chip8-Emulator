@@ -301,3 +301,24 @@ void chip8::OP_DXYN(void) //draws N pixels tall sprite from memory location in i
             break;
     }
 }
+
+void chip8::OP_FX07(void) //VX is set to value of the delay timer
+{
+    uint8_t regx_id = (opcode & 0x0F00) >> 8;
+    
+    registers[regx_id] = delay_timer;
+}
+
+void chip8::OP_FX15(void) //delay timer is set to value of VX
+{
+    uint8_t regx_id = (opcode & 0x0F00) >> 8;
+
+    delay_timer = registers[regx_id];
+} 
+
+void chip8::OP_FX18(void) //sound timer is set to value of VX
+{
+    uint8_t regx_id = (opcode & 0x0F00) >> 8;
+
+    sound_timer = registers[regx_id];
+}

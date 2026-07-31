@@ -173,6 +173,27 @@ void chip8::Execute(void)
             OP_DXYN();
             break;
 
+        case 0xF000:
+            switch (opcode & 0x00FF)
+            {
+                case 0x0007:
+                    OP_FX07();
+                    break;
+            
+                case 0x0015:
+                    OP_FX15();
+                    break;
+                
+                case 0x0018:
+                    OP_FX18();
+                    break;
+
+                default:
+                    Warning(0);
+                    break;
+            }
+            break;
+
         default:
             Warning(0);
             break;

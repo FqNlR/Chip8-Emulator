@@ -72,4 +72,7 @@ class chip8
         void OP_CXNN(void); //VX is set to bitwise AND between NN and a random number
         void OP_DXYN(void); //draws N pixels tall sprite from memory location in index, at the horizontal X coordinate
                             //represented by the value in VX and the Y coordinate in VY.
+        void OP_FX07(void); //VX is set to value of the delay timer
+        void OP_FX15(void); //delay timer is set to value of VX 
+        void OP_FX18(void); //sound timer is set to value of VX
 };
