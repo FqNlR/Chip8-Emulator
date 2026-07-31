@@ -27,7 +27,7 @@ class chip8
         void Set_Vy_Shift(bool);
         void Set_Vx_Jump(bool);
         void Set_Legacy_Indexing(bool);
-        void Set_FX1E_Treats_OV(bool);
+        void Set_FX1E_Sets_OV(bool);
         void Set_KeyPad(const int, bool);
         
     private:
@@ -47,7 +47,7 @@ class chip8
         bool vy_shift = false;
         bool vx_jump = false;
         bool legacy_indexing = false;
-        bool fx1e_treats_ov = false;
+        bool fx1e_sets_ov = false;
         bool waiting_key_release = false;
         uint8_t waiting_key = 0;
         

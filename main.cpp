@@ -6,7 +6,7 @@ int main(int argc, char* argv[])
     if(argc < 3 || argc > 7)
     {
         std::cout << "Usage: chip8.exe [ROM_NAME] [CHIP-8 CYCLES PER FRAME] " << 
-        "[--vy_shift --vx_jump --legacy_indexing --fx1e_treats_ov]" << std::endl;
+        "[--vy_shift --vx_jump --legacy_indexing --fx1e_sets_ov]" << std::endl;
         return -1;
     }
     
@@ -38,8 +38,8 @@ int main(int argc, char* argv[])
             if(strcmp(argv[i], "--legacy_indexing") == 0)
                 chip.Set_Legacy_Indexing(true);
             
-            if(strcmp(argv[i], "--fx1e_treats_ov") == 0)
-                chip.Set_FX1E_Treats_OV(true);
+            if(strcmp(argv[i], "--fx1e_sets_ov") == 0)
+                chip.Set_FX1E_Sets_OV(true);
         }
     }
 
