@@ -30,6 +30,7 @@ class chip8
         void Set_FX1E_Sets_OV(bool);
         void Set_Logic_Resets_VF(bool);
         void Set_KeyPad(const int, bool);
+        bool Is_Sound_Active(void);
         
     private:
         uint16_t pc = 0;

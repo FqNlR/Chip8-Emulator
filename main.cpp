@@ -48,6 +48,10 @@ int main(int argc, char* argv[])
 
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "chip8");
     SetTargetFPS(FPS);
+    InitAudioDevice();
+    SetAudioStreamBufferSizeDefault(AUDIO_BUFFER_SIZE);
+    AudioStream beep_stream = LoadAudioStream(AUDIO_SAMPLE_RATE, 32, 1);
+    PlayAudioStream(beep_stream);
 
     bool emulation_running = true;
     while(!WindowShouldClose())
@@ -55,7 +59,7 @@ int main(int argc, char* argv[])
         for(int key = 0; key < 16; key++)
             chip.Set_KeyPad(key, IsKeyDown(KEYMAP[key]));
         
-            if(emulation_running)
+        if(emulation_running)
         {
             for(int i = 0; i < CYCLES_PER_FRAME; i++)
             {
@@ -66,6 +70,8 @@ int main(int argc, char* argv[])
                 }
             }    
         }
+
+        Update_Beeper(beep_stream, chip.Is_Sound_Active());
 
         BeginDrawing();
         ClearBackground(BLACK);
@@ -82,10 +88,42 @@ int main(int argc, char* argv[])
         chip.Update_Timers();
     }
 
+    StopAudioStream(beep_stream);
+    UnloadAudioStream(beep_stream);
+    CloseAudioDevice();
     CloseWindow();
 
     chip.Print_Registers();
-    //chip.Print_Memory(0x0200, 0x0220);
 
     return 0;
+}
+
+void Update_Beeper(AudioStream stream, bool sound_active)
+{
+    static float phase = 0.0f;
+
+    if(!IsAudioStreamProcessed(stream))
+        return;
+
+    std::array<float, AUDIO_BUFFER_SIZE> samples{};
+
+    const float phase_step =
+        2.0f * PI * BEEP_FREQUENCY / AUDIO_SAMPLE_RATE;
+
+    for(float& sample : samples)
+    {
+        if(sound_active)
+        {
+            sample = std::sin(phase) * BEEP_AMPLITUDE;
+
+            phase += phase_step;
+
+            if(phase >= 2.0f * PI)
+                phase -= 2.0f * PI;
+        }
+        else
+            sample = 0.0f;
+    }
+
+    UpdateAudioStream(stream, samples.data(), AUDIO_BUFFER_SIZE);
 }

@@ -3,11 +3,18 @@
 #include "raylib.h"
 #include "chip8.hpp"
 #include <cstring>
+#include <cmath>
 
 const int SCALE = 15;
 const int WINDOW_HEIGHT = VIDEO_HEIGHT * SCALE;
 const int WINDOW_WIDTH = VIDEO_WIDTH * SCALE;
 const int FPS = 60;
+
+const int AUDIO_SAMPLE_RATE = 44100;
+const int AUDIO_BUFFER_SIZE = 512;
+
+const float BEEP_FREQUENCY = 440.0f;
+const float BEEP_AMPLITUDE = 0.20f;
 
 const int KEYMAP[16] =
 {   
@@ -29,3 +36,5 @@ const int KEYMAP[16] =
     KEY_F,          //E
     KEY_V           //F
 };
+
+void Update_Beeper(AudioStream, bool);

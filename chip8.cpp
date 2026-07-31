@@ -252,10 +252,7 @@ void chip8::Update_Timers(void)
     if(delay_timer > 0)
         delay_timer--;
     if(sound_timer > 0)
-    {
-        std::cout << '\a' << std::endl;
         sound_timer--;
-    }
 }
 
 void chip8::Print_Registers(void) //prints all registers, pc and index
@@ -340,4 +337,9 @@ void chip8::Set_KeyPad(const int key, bool state)
 {
     if(key >= 0 && key < 16)
         keypad[key] = state;
+}
+
+bool chip8::Is_Sound_Active(void)
+{
+    return sound_timer > 0;
 }
