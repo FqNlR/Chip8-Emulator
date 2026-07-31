@@ -1,6 +1,7 @@
 #pragma once
 
 #include "raylib.h"
+#include "chip8.hpp"
 #include <cstring>
 
 const int SCALE = 15;
