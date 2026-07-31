@@ -190,6 +190,26 @@ void chip8::Execute(void)
                     OP_FX0A();
                     break;
 
+                case 0x001E:
+                    OP_FX1E();
+                    break;
+
+                case 0x0029:
+                    OP_FX29();
+                    break;
+
+                case 0x0033:
+                    OP_FX33();
+                    break;
+
+                case 0x0055:
+                    OP_FX55();
+                    break;
+
+                case 0x0065:
+                    OP_FX65();
+                    break;
+
                 default:
                     Warning(0);
                     break;
