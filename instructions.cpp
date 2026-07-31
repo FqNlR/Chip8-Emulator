@@ -108,6 +108,9 @@ void chip8::OP_8XY1(void) //VX is set to result of bitwise OR of VX and VY
     uint8_t regy_id = (opcode & 0x00F0) >> 4;
 
     registers[regx_id] = registers[regx_id] | registers[regy_id];
+
+    if(logic_resets_vf)
+        registers[REGF_ID] = 0;
 }
 
 void chip8::OP_8XY2(void) //VX is set to result of bitwise AND of VX and VY
@@ -116,6 +119,9 @@ void chip8::OP_8XY2(void) //VX is set to result of bitwise AND of VX and VY
     uint8_t regy_id = (opcode & 0x00F0) >> 4;
 
     registers[regx_id] = registers[regx_id] & registers[regy_id];
+
+    if(logic_resets_vf)
+        registers[REGF_ID] = 0;
 }   
 
 void chip8::OP_8XY3(void) //VX is set to result of bitwise XOR of VX and VY
@@ -124,6 +130,9 @@ void chip8::OP_8XY3(void) //VX is set to result of bitwise XOR of VX and VY
     uint8_t regy_id = (opcode & 0x00F0) >> 4;
 
     registers[regx_id] = registers[regx_id] ^ registers[regy_id];
+
+    if(logic_resets_vf)
+        registers[REGF_ID] = 0;
 }
 
 void chip8::OP_8XY4(void) //VX is set to result of VX + VY. affects VF
