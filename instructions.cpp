@@ -359,10 +359,80 @@ void chip8::OP_FX0A(void) //waits for keypad input and then sets VX to input val
     {
         if(keypad[key])
         {
-            registers[regx_id] = static_cast<int>(key);
+            registers[regx_id] = static_cast<uint8_t>(key);
             return;
         }
     }
 
     pc -= 2;
+}
+
+void chip8::OP_FX1E(void) //adds value of VX to index. sets VF to 1 if value overflows
+{
+    uint8_t regx_id = (opcode & 0x0F00) >> 8;
+
+    if(index + registers[regx_id] >= MEMORY_SIZE)
+        registers[REGF_ID] = 1;
+    else
+        registers[REGF_ID] = 0;
+
+    index += registers[regx_id];
+}
+
+void chip8::OP_FX29(void) //sets index to address of hex character in VX
+{
+    uint8_t regx_id = (opcode & 0x0F00) >> 8;
+    uint8_t character = registers[regx_id] & 0x0F;
+    
+    index = FONT_START_ADDRESS + character * 5;
+}
+
+void chip8::OP_FX33(void) //converts byte in VX to three decimal digits and stores them at index, index+1 and index+2
+{
+    uint8_t regx_id = (opcode & 0x0F00) >> 8;
+    uint8_t value = registers[regx_id];
+
+    if(index + 2 >= MEMORY_SIZE)
+    {
+        Warning(4);
+        return;
+    }
+
+    memory[index] = value / 100;
+    memory[index + 1] = (value / 10) % 10;
+    memory[index + 2] = value % 10;
+}
+
+void chip8::OP_FX55(void) //stores in successive memory addresses the values from V0 to VX
+{
+    uint8_t regx_id = (opcode & 0x0F00) >> 8;
+
+    if(index + regx_id >= MEMORY_SIZE)
+    {
+        Warning(4);
+        return;
+    }
+
+    for(int i = 0; i <= regx_id; i++)
+        memory[index + i] = registers[i];
+
+    if(legacy_indexing)
+        index += regx_id + 1;
+}
+
+void chip8::OP_FX65(void) //stores successive memory addresses in the registers V0 to VX
+{
+    uint8_t regx_id = (opcode & 0x0F00) >> 8;
+
+    if(index + regx_id >= MEMORY_SIZE)
+    {
+        Warning(4);
+        return;
+    }
+
+    for(int i = 0; i <= regx_id; i++)
+        registers[i] = memory[index + i];
+
+    if(legacy_indexing)
+        index += regx_id + 1;
 }

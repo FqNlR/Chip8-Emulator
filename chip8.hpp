@@ -7,7 +7,10 @@
 
 const uint8_t VIDEO_HEIGHT = 32;
 const uint8_t VIDEO_WIDTH = 64;
+const uint8_t FONT_SIZE = 80;
+const uint8_t FONT_START_ADDRESS = 0x050;
 const uint16_t MEMORY_SIZE = 4096;
+const uint16_t ROM_START_ADDRESS = 0x200;
 
 class chip8
 {
@@ -23,6 +26,7 @@ class chip8
         void Print_Registers(void);
         void Set_Vy_Shift(bool);
         void Set_Vx_Jump(bool);
+        void Set_Legacy_Indexing(bool);
         void Set_KeyPad(const int, bool);
         
     private:
@@ -41,6 +45,7 @@ class chip8
         bool stop_execution_flag = false;
         bool vy_shift = false;
         bool vx_jump = false;
+        bool legacy_indexing = false;
         
         bool Fetch(void);
         void Execute(void);
@@ -78,4 +83,9 @@ class chip8
         void OP_EX9E(void); //skips one instruction if the key corresponding to value of VX is pressed
         void OP_EXA1(void); //skips one instruction if the key corresponding to value of VX is not pressed
         void OP_FX0A(void); //waits for keypad input and then sets VX to input value
+        void OP_FX1E(void); //adds value of VX to index. sets VF to 1 if value overflows
+        void OP_FX29(void); //sets index to address of hex character in VX
+        void OP_FX33(void); //converts byte in VX to three decimal digits and stores them at index, index+1 and index+2
+        void OP_FX55(void); //stores in successive memory addresses the values from V0 to VX
+        void OP_FX65(void); //stores successive memory addresses in the registers V0 to VX
 };

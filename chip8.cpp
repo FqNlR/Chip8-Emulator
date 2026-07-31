@@ -2,10 +2,6 @@
 #include <iomanip>
 #include <fstream>
 
-const uint8_t FONT_SIZE = 80;
-const uint8_t FONT_START_ADDRESS = 0x050;
-const uint16_t ROM_START_ADDRESS = 0x200;
-
 chip8::chip8(void) //constructor
 : rnd_generator(std::random_device{}()),
   rnd_byte_dist(0, 255)
@@ -236,7 +232,10 @@ void chip8::Update_Timers(void)
     if(delay_timer > 0)
         delay_timer--;
     if(sound_timer > 0)
+    {
+        std::cout << '\a' << std::endl;
         sound_timer--;
+    }
 }
 
 void chip8::Print_Registers(void) //prints all registers, pc and index
@@ -285,7 +284,7 @@ void chip8::Warning(const int error_type) //prints error message and stops execu
             std::cout << "\n\nINVALID JUMP INSTRUCTION\n\n";
             break;
         case 4:
-            std::cout << "\n\nINVALID INDEX IN DRAW FUNCTION\n\n";
+            std::cout << "\n\nINVALID INDEX\n\n";
             break;
     }
 
@@ -300,6 +299,11 @@ void chip8::Set_Vy_Shift(bool set)
 void chip8::Set_Vx_Jump(bool set)
 {
     vx_jump = set;
+}
+
+void chip8::Set_Legacy_Indexing(bool set)
+{
+    legacy_indexing = set;
 }
 
 void chip8::Set_KeyPad(const int key, bool state)

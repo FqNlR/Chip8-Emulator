@@ -1,18 +1,18 @@
 #include "chip8.hpp"
-#include "main.hpp"
+#include "front.hpp"
 
 int main(int argc, char* argv[])
 {
-    if(argc < 3 || argc > 5)
+    if(argc < 3 || argc > 6)
     {
-        std::cout << "Usage: chip8.exe [ROM_NAME] [CHIP-8 CYCLES PER SECOND] [--vy_shift --vx_jump]" << std::endl;
+        std::cout << "Usage: chip8.exe [ROM_NAME] [CHIP-8 CYCLES PER FRAME] [--vy_shift --vx_jump]" << std::endl;
         return -1;
     }
     
     const int CYCLES_PER_FRAME = atoi(argv[2]);
     if(CYCLES_PER_FRAME <= 0)
     {
-        std::cout << "ERROR: Cycles per second must be equal to or greater than 1" << std::endl;
+        std::cout << "ERROR: Cycles per frame must be equal to or greater than 1" << std::endl;
         return -1;
     }   
 
@@ -33,6 +33,9 @@ int main(int argc, char* argv[])
 
             if(strcmp(argv[i], "--vx_jump") == 0)
                 chip.Set_Vx_Jump(true);
+            
+            if(strcmp(argv[i], "--legacy_indexing") == 0)
+                chip.Set_Legacy_Indexing(true);
         }
     }
 
@@ -74,10 +77,8 @@ int main(int argc, char* argv[])
 
     CloseWindow();
 
-    std::system("cls");
     chip.Print_Registers();
     //chip.Print_Memory(0x0200, 0x0220);
-    std::system("pause");
 
     return 0;
 }
