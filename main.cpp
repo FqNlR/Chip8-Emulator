@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "chip8");
+    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "CHIP-8 Emulator");
     SetTargetFPS(FPS);
     InitAudioDevice();
     SetAudioStreamBufferSizeDefault(AUDIO_BUFFER_SIZE);
@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
         {
             for(int j = 0; j < VIDEO_WIDTH; j++)
             {
-                if(chip.video[i * VIDEO_WIDTH + j] == 1)
+                if(chip.Get_Video(i * VIDEO_WIDTH + j) == 1)
                     DrawRectangle(j * SCALE, i * SCALE, SCALE, SCALE, DARKBLUE);
             }
         }

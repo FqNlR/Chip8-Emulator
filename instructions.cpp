@@ -1,6 +1,6 @@
 #include "chip8.hpp"
 
-const uint8_t REGF_ID = 0x0F;
+constexpr uint8_t REGF_ID = 0x0F;
 
 void chip8::OP_00E0(void) //clear screen
 {

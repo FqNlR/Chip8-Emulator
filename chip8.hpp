@@ -5,18 +5,16 @@
 #include <array>
 #include <random>
 
-const uint8_t VIDEO_HEIGHT = 32;
-const uint8_t VIDEO_WIDTH = 64;
-const uint8_t FONT_SIZE = 80;
-const uint8_t FONT_START_ADDRESS = 0x050;
-const uint16_t MEMORY_SIZE = 4096;
-const uint16_t ROM_START_ADDRESS = 0x200;
+constexpr uint8_t VIDEO_HEIGHT = 32;
+constexpr uint8_t VIDEO_WIDTH = 64;
+constexpr uint8_t FONT_SIZE = 80;
+constexpr uint8_t FONT_START_ADDRESS = 0x050;
+constexpr uint16_t MEMORY_SIZE = 4096;
+constexpr uint16_t ROM_START_ADDRESS = 0x200;
 
 class chip8
 {
     public:
-        
-        bool video[VIDEO_HEIGHT * VIDEO_WIDTH] = {};
         
         chip8(void);
         bool Load_ROM(const char*);
@@ -30,9 +28,11 @@ class chip8
         void Set_FX1E_Sets_OV(bool);
         void Set_Logic_Resets_VF(bool);
         void Set_KeyPad(const int, bool);
-        bool Is_Sound_Active(void);
+        const bool Get_Video(const int);
+        const bool Is_Sound_Active(void);
         
     private:
+        bool video[VIDEO_HEIGHT * VIDEO_WIDTH] = {};
         uint16_t pc = 0;
         uint8_t delay_timer = 0;
         uint8_t sound_timer = 0;
