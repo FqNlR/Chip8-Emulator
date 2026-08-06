@@ -10,9 +10,11 @@ constexpr int WINDOW_HEIGHT = VIDEO_HEIGHT * SCALE;
 constexpr int WINDOW_WIDTH = VIDEO_WIDTH * SCALE;
 constexpr int FPS = 60;
 
+constexpr double TIMER_FREQUENCY = 60.0;        
+constexpr double TIMER_INTERVAL = 1.0 / TIMER_FREQUENCY;
+
 constexpr int AUDIO_SAMPLE_RATE = 44100;
 constexpr int AUDIO_BUFFER_SIZE = 512;
-
 constexpr float BEEP_FREQUENCY = 440.0f;
 constexpr float BEEP_AMPLITUDE = 0.20f;
 
