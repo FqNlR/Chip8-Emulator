@@ -269,16 +269,19 @@ void chip8::OP_DXYN(void) //draws N pixels tall sprite from memory location in i
     uint8_t value_y = registers[regy_id] & 31;
     uint8_t N = opcode & 0x000F;
     bool stop_drawing = false;
+
+    uint32_t sprite_end = static_cast<uint32_t>(index) + N;
+
+    if(sprite_end > MEMORY_SIZE)
+    {
+        Warning(4);
+        return;
+    }
+    
     registers[REGF_ID] = 0;
     
     for(int i = 0; i < N; i++)
     {
-        if(index + i >= MEMORY_SIZE)
-        {
-            Warning(4);
-            return;
-        }
-
         uint8_t sprite = memory[index + i];
 
         for(int j = 0; j < 8; j++)
