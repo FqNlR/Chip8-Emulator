@@ -2,8 +2,6 @@
 
 #include "raylib.h"
 #include "chip8.hpp"
-#include <cstring>
-#include <cmath>
 
 constexpr int SCALE = 15;
 constexpr int WINDOW_HEIGHT = VIDEO_HEIGHT * SCALE;
@@ -14,7 +12,7 @@ constexpr double TIMER_FREQUENCY = 60.0;
 constexpr double TIMER_INTERVAL = 1.0 / TIMER_FREQUENCY;
 
 constexpr int AUDIO_SAMPLE_RATE = 44100;
-constexpr int AUDIO_BUFFER_SIZE = 512;
+constexpr int AUDIO_BUFFER_SIZE = 4096;
 constexpr float BEEP_FREQUENCY = 440.0f;
 constexpr float BEEP_AMPLITUDE = 0.20f;
 

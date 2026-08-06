@@ -1,5 +1,6 @@
 #include "chip8.hpp"
 #include "front.hpp"
+#include <cstring>
 
 int main(int argc, char* argv[])
 {
@@ -13,7 +14,7 @@ int main(int argc, char* argv[])
     const int CPU_FREQUENCY = atoi(argv[2]);
     if(CPU_FREQUENCY <= 0)
     {
-        std::cout << "ERROR: Cycles per frame must be equal to or greater than 1" << std::endl;
+        std::cout << "ERROR: CPU frequency must be equal to or greater than 1" << std::endl;
         return -1;
     }   
 
@@ -75,7 +76,7 @@ int main(int argc, char* argv[])
                 chip.Update_Timers();
                 timer_accumulator -= TIMER_INTERVAL;
             }
-            
+
             cpu_accumulator += delta_time;
             while(cpu_accumulator >= cpu_interval)
             {

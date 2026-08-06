@@ -28,8 +28,8 @@ class chip8
         void Set_FX1E_Sets_OV(bool);
         void Set_Logic_Resets_VF(bool);
         void Set_KeyPad(const int, bool);
-        const bool Get_Video(const int);
-        const bool Is_Sound_Active(void);
+        bool Get_Video(const int) const;
+        bool Is_Sound_Active(void) const;
         
     private:
         bool video[VIDEO_HEIGHT * VIDEO_WIDTH] = {};

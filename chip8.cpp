@@ -339,12 +339,12 @@ void chip8::Set_KeyPad(const int key, bool state)
         keypad[key] = state;
 }
 
-const bool chip8::Is_Sound_Active(void)
+bool chip8::Is_Sound_Active(void) const
 {
     return sound_timer > 0;
 }
 
-const bool chip8::Get_Video(const int key)
+bool chip8::Get_Video(const int key) const
 {
     return video[key];
 }
