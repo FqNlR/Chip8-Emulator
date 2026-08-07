@@ -1,19 +1,20 @@
 #include "chip8.hpp"
 #include "front.hpp"
+#include <cstring>
 
 int main(int argc, char* argv[])
 {
-    if(argc < 3 || argc > 8)
+    if(argc < 3)
     {
-        std::cout << "Usage: chip8.exe [ROM_NAME] [CHIP-8 CYCLES PER FRAME] " << 
+        std::cout << "Usage: chip8.exe [ROM_NAME] [CHIP-8 CPU FREQUENCY] " << 
         "[--vy_shift --vx_jump --legacy_indexing --fx1e_sets_ov --logic_resets_vf]" << std::endl;
         return -1;
     }
     
-    const int CYCLES_PER_FRAME = atoi(argv[2]);
-    if(CYCLES_PER_FRAME <= 0)
+    const int CPU_FREQUENCY = atoi(argv[2]);
+    if(CPU_FREQUENCY <= 0)
     {
-        std::cout << "ERROR: Cycles per frame must be equal to or greater than 1" << std::endl;
+        std::cout << "ERROR: CPU frequency must be equal to or greater than 1" << std::endl;
         return -1;
     }   
 
@@ -46,7 +47,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "chip8");
+    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "CHIP-8 Emulator");
     SetTargetFPS(FPS);
     InitAudioDevice();
     SetAudioStreamBufferSizeDefault(AUDIO_BUFFER_SIZE);
@@ -54,23 +55,41 @@ int main(int argc, char* argv[])
     PlayAudioStream(beep_stream);
 
     bool emulation_running = true;
+    const double cpu_interval = 1.0 / CPU_FREQUENCY;    //seconds between chip8 instructions
+    double cpu_accumulator = 0.0;                       //unprocessed cpu time
+    double timer_accumulator = 0.0;                     //unprocessed timer time
     while(!WindowShouldClose())
     {
+        double delta_time = static_cast<double>(GetFrameTime());
+
+        if(delta_time > 0.1)
+            delta_time = 0.1;
+
         for(int key = 0; key < 16; key++)
             chip.Set_KeyPad(key, IsKeyDown(KEYMAP[key]));
         
         if(emulation_running)
         {
-            for(int i = 0; i < CYCLES_PER_FRAME; i++)
+            timer_accumulator += delta_time;
+            while(timer_accumulator >= TIMER_INTERVAL)
+            {
+                chip.Update_Timers();
+                timer_accumulator -= TIMER_INTERVAL;
+            }
+
+            cpu_accumulator += delta_time;
+            while(cpu_accumulator >= cpu_interval)
             {
                 if(!chip.Cycle())
                 {
                     emulation_running = false;
                     break;
                 }
-            }    
-        }
 
+                cpu_accumulator -= cpu_interval;
+            }
+        }
+        
         Update_Beeper(beep_stream, chip.Is_Sound_Active());
 
         BeginDrawing();
@@ -79,13 +98,11 @@ int main(int argc, char* argv[])
         {
             for(int j = 0; j < VIDEO_WIDTH; j++)
             {
-                if(chip.video[i * VIDEO_WIDTH + j] == 1)
+                if(chip.Get_Video(i * VIDEO_WIDTH + j) == 1)
                     DrawRectangle(j * SCALE, i * SCALE, SCALE, SCALE, DARKBLUE);
             }
         }
         EndDrawing();
-
-        chip.Update_Timers();
     }
 
     StopAudioStream(beep_stream);
