@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
     CloseAudioDevice();
     CloseWindow();
 
-    chip.Print_Registers();
+    //chip.Print_Registers();
 
     return 0;
 }
