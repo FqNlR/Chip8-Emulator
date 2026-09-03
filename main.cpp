@@ -7,7 +7,7 @@ int main(int argc, char* argv[])
     if(argc < 3)
     {
         std::cout << "Usage: chip8.exe [ROM_NAME] [CHIP-8 CPU FREQUENCY] " << 
-        "[--vy_shift --vx_jump --legacy_indexing --fx1e_sets_ov --logic_resets_vf]" << std::endl;
+        "[--vy_shift --vx_jump --legacy_indexing --fx1e_sets_ov --logic_resets_vf --debug]" << std::endl;
         return -1;
     }
     
@@ -44,6 +44,9 @@ int main(int argc, char* argv[])
 
             if(strcmp(argv[i], "--logic_resets_vf") == 0)
                 chip.Set_Logic_Resets_VF(true);
+
+            if(strcmp(argv[i], "--debug") == 0)
+                debug_mode = true;
         }
     }
 
@@ -53,6 +56,7 @@ int main(int argc, char* argv[])
     SetAudioStreamBufferSizeDefault(AUDIO_BUFFER_SIZE);
     AudioStream beep_stream = LoadAudioStream(AUDIO_SAMPLE_RATE, 32, 1);
     PlayAudioStream(beep_stream);
+    system("cls");
 
     bool emulation_running = true;
     const double cpu_interval = 1.0 / CPU_FREQUENCY;    //seconds between chip8 instructions
@@ -92,17 +96,34 @@ int main(int argc, char* argv[])
         
         Update_Beeper(beep_stream, chip.Is_Sound_Active());
 
-        BeginDrawing();
-        ClearBackground(BLUE);
-        for(int i = 0; i < VIDEO_HEIGHT; i++)
+        if(IsKeyDown(KEY_P) && debug_mode)
         {
-            for(int j = 0; j < VIDEO_WIDTH; j++)
-            {
-                if(chip.Get_Video(i * VIDEO_WIDTH + j) == 1)
-                    DrawRectangle(j * SCALE, i * SCALE, SCALE, SCALE, DARKBLUE);
-            }
+            system("cls");
+            chip.Print_Registers();
+            emulation_running = false;
         }
-        EndDrawing();
+
+        do
+        {
+            BeginDrawing();
+            ClearBackground(BLUE);
+            for(int i = 0; i < VIDEO_HEIGHT; i++)
+            {
+                for(int j = 0; j < VIDEO_WIDTH; j++)
+                {
+                    if(chip.Get_Video(i * VIDEO_WIDTH + j) == 1)
+                        DrawRectangle(j * SCALE, i * SCALE, SCALE, SCALE, DARKBLUE);
+                }
+            }
+            EndDrawing();
+
+            if(IsKeyDown(KEY_U) && debug_mode)
+            {
+                system("cls");
+                emulation_running = true;
+            }
+
+        } while(!emulation_running && !WindowShouldClose());
     }
 
     StopAudioStream(beep_stream);

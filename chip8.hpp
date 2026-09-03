@@ -11,6 +11,7 @@ constexpr uint8_t FONT_SIZE = 80;
 constexpr uint8_t FONT_START_ADDRESS = 0x050;
 constexpr uint16_t MEMORY_SIZE = 4096;
 constexpr uint16_t ROM_START_ADDRESS = 0x200;
+inline bool debug_mode = false;
 
 class chip8
 {
