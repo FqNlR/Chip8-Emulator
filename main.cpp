@@ -59,6 +59,7 @@ int main(int argc, char* argv[])
     system("cls");
 
     bool emulation_running = true;
+    bool step_mode = false;
     const double cpu_interval = 1.0 / CPU_FREQUENCY;    //seconds between chip8 instructions
     double cpu_accumulator = 0.0;                       //unprocessed cpu time
     double timer_accumulator = 0.0;                     //unprocessed timer time
@@ -116,6 +117,20 @@ int main(int argc, char* argv[])
                 }
             }
             EndDrawing();
+
+            if(step_mode)
+            {
+                step_mode = false;
+                emulation_running = false;
+                system("cls");
+                chip.Print_Registers();
+            }
+
+            if(IsKeyPressed(KEY_SPACE) && debug_mode)
+            {
+                step_mode = true;
+                emulation_running = true;
+            }
 
             if(IsKeyDown(KEY_U) && debug_mode)
             {
