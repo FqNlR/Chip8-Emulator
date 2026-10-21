@@ -257,6 +257,9 @@ void chip8::Update_Timers(void)
 
 void chip8::Print_Registers(void) //prints all registers, pc and index
 {
+    if(!debug_mode)
+        return;
+
     for(int i = 0; i < 16; i++)
         std::cout << "register v" << i << ": " << std::hex << static_cast<int>(registers[i]) << std::endl;
 
@@ -268,6 +271,9 @@ void chip8::Print_Registers(void) //prints all registers, pc and index
 
 void chip8::Print_Memory(const int start, const int end) //prints memory from start address to end adress
 {
+    if(!debug_mode)
+        return;
+    
     if(start < 0 || start >= MEMORY_SIZE || end <= start || end > MEMORY_SIZE)
     {
         Warning(2);
